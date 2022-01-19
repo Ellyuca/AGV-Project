@@ -74,7 +74,7 @@ def main(dataset_name,
         
         best = []         
         prediction_on_bestind = {}
-        for i in range(3):
+        for i in range(X.shape[0]):
           print("Exec optimizer on image :", i)  
           opt = AGVOptimizer(Nf=number_of_filters, 
                               filters=Filters,
