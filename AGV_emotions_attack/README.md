@@ -16,7 +16,7 @@ pip install -r requirements_gpu.txt
 
 # 2. Example of how to run the code:
 ```sh
-python attacks/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 2 -pp 
+python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 2 -pp 
 "offsprings" -ps "direct" -po "ES"  -np 10 -el true -s pareto -df1 ssim  
 -db "EMO-SUBSET-80-EMO-MOBILENET_V2-SINGLE"  -nf 3 -r true -lf TEST.out   
 ```
