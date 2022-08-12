@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__),'..'))
 sys.path.append(os.path.join(os.path.dirname(__file__),'..', ".."))
 
 
-from datasets.images import AffectNetDataset
+from datasets.images import Imagenet
 
 DATASET_ID = 0
 MODEL_ID = 1
@@ -31,7 +31,7 @@ class DatasetSubset:
             self.stop_nsamples = start_nsamples + nsamples
 
     def get_test_dataset(self):
-        if self.name == "AffectNetDataset":
+        if self.name == "Imagenet":
             affectnet_max_images = 50000
             if self.nsamples == 'all' and self.start_nsamples > 0:
                 X_train, Y_train = self.base_class.get_test_dataset(num_images=affectnet_max_images)
@@ -65,9 +65,9 @@ class DatasetSubset:
 def database_and_model():
     return {
 
-        'EMO-SUBSET-80-EMO-MOBILENET_V2-SINGLE' : [
-            DatasetSubset(AffectNetDataset, nsamples = 80, start_nsamples=0),
-            'emo_mobilenet_v2',       
+        'IMAGENET-MOBILENET' : [
+            DatasetSubset(Imagenet, nsamples = 80, start_nsamples=0),
+            'mobilenet',       
         ],            
 
     }    

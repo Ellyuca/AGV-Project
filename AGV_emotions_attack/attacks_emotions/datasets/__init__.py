@@ -1,2 +1,2 @@
 from .datasets_utils import *
-from .images import AffectNetDataset
+from .images import Imagenet

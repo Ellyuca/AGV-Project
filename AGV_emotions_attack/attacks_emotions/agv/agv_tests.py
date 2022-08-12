@@ -17,7 +17,7 @@ import tensorflow as tf
 
 # load classes json data
 json_file = open(os.path.join(os.path.join(pathlib.Path(__file__).parent.absolute(), 
-                                      "../datasets/emotion_dataset_class_index.json")))
+                                      "../datasets/imagenet_class_index.json")))
 class_names = json.load(json_file)
 
 def one_sample_batch(image):
