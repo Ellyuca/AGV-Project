@@ -10,7 +10,7 @@ from datasets.images import Imagenet
 DATASET_ID = 0
 MODEL_ID = 1
 
-#test
+
 def build_model_and_dataset(dataset_name):
     info_db_fq = database_and_model()[dataset_name]
     dataset = info_db_fq[DATASET_ID]   

@@ -56,6 +56,7 @@ class Imagenet:
             raise Exception("Please prepare the dataset first")
 
     def get_test_dataset(self, img_size=224, num_images=100):
+        print('PORCO IL CLERO')
         self.image_size = img_size
         X, Y = data_images(self.img_folder, self.image_size, selected_idx=num_images)
         X /= 255
