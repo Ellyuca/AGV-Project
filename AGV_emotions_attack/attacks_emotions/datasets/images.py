@@ -4,6 +4,7 @@ import pathlib
 import numpy as np
 import os
 
+import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from models.keras_models import keras_mobilenet_model
 # pool = Pool()
@@ -55,13 +56,13 @@ class Imagenet:
         if not os.path.isdir:
             raise Exception("Please prepare the dataset first")
 
+
     def get_test_dataset(self, img_size=224, num_images=100):
-        #print('PORCO IL CLERO')
         self.image_size = img_size
         X, Y = data_images(self.img_folder, self.image_size, selected_idx=num_images)
         X /= 255
+        #X = tf.keras.applications.mobilenet.preprocess_input(X) #if you want to do preprocessing before
         return X, Y
-
 
 
     def load_model_by_name(self, model_name):
