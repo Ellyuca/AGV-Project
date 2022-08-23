@@ -32,7 +32,7 @@ def MobileNet_model(input_shape):
   core = tf.keras.applications.ResNet50()
   x = core(x)
 
-  model = tf.keras.Model(input=[inputs], outputs=[x])
+  model = tf.keras.Model(inputs=[inputs], outputs=[x])
 
   return model
 
