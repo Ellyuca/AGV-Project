@@ -4,31 +4,6 @@ import copy
 import agv_individual
 import base64
 
-###
-import argparse
-import cv2
-import numpy as np
-import torch
-from torchvision import models
-from pytorch_grad_cam import GradCAM,HiResCAM, \
-    ScoreCAM, \
-    GradCAMPlusPlus, \
-    AblationCAM, \
-    XGradCAM, \
-    EigenCAM, \
-    EigenGradCAM, \
-    LayerCAM, \
-    FullGrad, \
-    GradCAMElementWise
-    
-from pytorch_grad_cam import GuidedBackpropReLUModel
-from pytorch_grad_cam.utils.image import show_cam_on_image, \
-    deprocess_image, \
-    preprocess_image
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-import matplotlib.pyplot as plt
-###
-
 class ModelLoader(object):
 
     def __init__(self):
