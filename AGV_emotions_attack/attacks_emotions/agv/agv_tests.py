@@ -22,7 +22,7 @@ import cv2
 import numpy as np
 import torch
 from torchvision import models
-from pytorch_grad_Cam import *
+from pytorch_grad_cam import *
 '''
 ###
 import argparse
