@@ -4,6 +4,31 @@ import copy
 import agv_individual
 import base64
 
+###
+import argparse
+import cv2
+import numpy as np
+import torch
+from torchvision import models
+from pytorch_grad_cam import GradCAM,HiResCAM, \
+    ScoreCAM, \
+    GradCAMPlusPlus, \
+    AblationCAM, \
+    XGradCAM, \
+    EigenCAM, \
+    EigenGradCAM, \
+    LayerCAM, \
+    FullGrad, \
+    GradCAMElementWise
+    
+from pytorch_grad_cam import GuidedBackpropReLUModel
+from pytorch_grad_cam.utils.image import show_cam_on_image, \
+    deprocess_image, \
+    preprocess_image
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+import matplotlib.pyplot as plt
+###
+
 class ModelLoader(object):
 
     def __init__(self):
@@ -24,7 +49,7 @@ class ModelLoader(object):
             jmodel["filters_data"] = filters_data_b64.decode("ascii")
             json.dump(jmodel, jfile, indent=4)
         return self
-
+    
     def apply(self,X):
         ilast = 0 
         image = X
@@ -33,6 +58,58 @@ class ModelLoader(object):
             image = ifilter(image,*self.model["params"][ilast:ilast+ifilter.nparams()])
             ilast += ifilter.nparams()
         return image
+    '''    
+    def apply(self,X):
+        model = models.resnet50(pretrained=True)
+        target_layers = [model.layer4]
+
+        origin_img = X * 255
+        rgb_img = origin_img[:, :, ::-1]
+        cv2.imwrite('rgb.JPEG', rgb_img)
+        cv2.imwrite('bgr.JPEG', origin_img)
+        
+        origin_img = np.float32(origin_img) / 255
+        input_tensor = preprocess_image(origin_img, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        cam_algorithm = GradCAM
+        with cam_algorithm(model = model, target_layers = target_layers) as cam:
+            cam.batch_size = 32
+            grayscale_cam = cam(input_tensor=input_tensor, targets=None)
+
+            # Here grayscale_cam has only one image in the batch
+            grayscale_cam = grayscale_cam[0, :]
+            mask = grayscale_cam * 255  #make range between 0-255
+
+        retval, img_thresh = cv2.threshold(mask, 160, 255, cv2.THRESH_BINARY)
+        mask = img_thresh.astype(np.uint8)
+        
+        # Create colorful checkerboard background "behind" the logo lettering.
+        img_applied_mask = cv2.bitwise_and(rgb_img, rgb_img, mask = mask)
+        #cv2.imwrite('provola.JPEG', img_applied_mask)
+
+        ilast = 0
+        image = img_applied_mask # qui devo mettere la zona da me interessata
+        #print('min',np.min(image))
+        #print(np.max(X))
+        #image = X
+        for fid in self.model["filters"]:
+            ifilter = self.model["filters_data"][fid]
+            image = ifilter(image,*self.model["params"][ilast:ilast+ifilter.nparams()])
+            ilast += ifilter.nparams()
+        
+
+        image = cv2.bitwise_and(image, image, mask= mask)
+        #print('min ', np.min(image))
+
+        cv2.imwrite('filtro.JPEG', image*255)
+        # qui devo rifare l'applicazione della maschera
+        img_logo_mask_inv = cv2.bitwise_not(mask)
+        img_foreground = cv2.bitwise_and(rgb_img, rgb_img, mask = img_logo_mask_inv)
+        #cv2.imwrite('provola.JPEG', image*255)
+        result = cv2.add(image,img_foreground/255)
+        #cv2.imwrite('provola.JPEG', result)
+        #print(np.max(result))
+        return result[:, :, ::-1]
+    '''
 
     def to_individual(self):
         indv = agv_individual.Individual(0,0,float("inf"))

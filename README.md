@@ -24,7 +24,7 @@ python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 10 -
 
 - To test the script with less execution:
 ```sh
-python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 1 -pp  "offsprings" -ps "direct" -po "ES"  -np 1 -el true -s pareto -df1 ssim -db "IMAGENET-MOBILENET"  -nf 3 -r true -lf TEST.out -sae 1
+python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 1 -pp  "offsprings" -ps "direct" -po "ES"  -np 1 -el true -s pareto -df1 ssim -db "IMAGENET-MOBILENET"  -nf 3 -r true -lf TEST.out
 ```
 
 - To see image result:

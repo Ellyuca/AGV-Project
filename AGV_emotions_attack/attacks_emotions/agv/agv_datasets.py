@@ -66,7 +66,7 @@ def database_and_model():
     return {
 
         'IMAGENET-MOBILENET' : [
-            DatasetSubset(Imagenet, nsamples = 10, start_nsamples=0),
+            DatasetSubset(Imagenet, nsamples = 1, start_nsamples=0),
             'mobilenet',       
         ],            
 
