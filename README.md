@@ -19,17 +19,17 @@ pip install -r requirements_gpu.txt
 ## 2. Example of how to run the code:
 - To launch the attack:
 ```sh
-python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 10 -pp  "offsprings" -ps "direct" -po "ES"  -np 10 -el true -s pareto -df1 ssim -db "IMAGENET-MOBILENET"  -nf 3 -r true -lf TEST.out
+python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 10 -pp  "offsprings" -ps "direct" -po "ES"  -np 10 -el true -s pareto -df1 ssim -db "IMAGENET-RESNET"  -nf 3 -r true -lf TEST.out
 ```
 
 - To test the script with less execution:
 ```sh
-python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 1 -pp  "offsprings" -ps "direct" -po "ES"  -np 1 -el true -s pareto -df1 ssim -db "IMAGENET-MOBILENET"  -nf 3 -r true -lf TEST.out
+python attacks_emotions/agv/agv_attack.py -l TEST.txt -o TEST.json -bs 1 -e 1 -pp  "offsprings" -ps "direct" -po "ES"  -np 1 -el true -s pareto -df1 ssim -db "IMAGENET-RESNET"  -nf 3 -r true -lf TEST.out
 ```
 
 - To see image result:
 ```sh
-python attacks_emotions/agv/agv_attack.py -bf TEST/best_jsons -db "IMAGENET-MOBILENET" -sae_best=True -img_id 0
+python attacks_emotions/agv/agv_attack.py -bf TEST/best_jsons -db "IMAGENET-RESNET" -sae_best=True -img_id 0
 
 or
 

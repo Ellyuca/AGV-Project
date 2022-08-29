@@ -1,1 +1,1 @@
-from .keras_models import keras_mobilenet_model
+from .keras_models import keras_resnet_model

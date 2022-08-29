@@ -65,9 +65,9 @@ class DatasetSubset:
 def database_and_model():
     return {
 
-        'IMAGENET-MOBILENET' : [
+        'IMAGENET-RESNET' : [
             DatasetSubset(Imagenet, nsamples = 1, start_nsamples=0),
-            'mobilenet',       
+            'resnet',       
         ],            
 
     }    

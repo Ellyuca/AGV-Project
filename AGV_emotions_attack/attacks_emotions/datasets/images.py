@@ -6,7 +6,7 @@ import os
 
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
-from models.keras_models import keras_mobilenet_model
+from models.keras_models import keras_resnet_model
 # pool = Pool()
 
 def load_single_image(img_path, img_size=224):
@@ -67,8 +67,8 @@ class Imagenet:
 
     def load_model_by_name(self, model_name):
  
-        if model_name == 'mobilenet':
-            model = keras_mobilenet_model() 
+        if model_name == 'resnet':
+            model = keras_resnet_model() 
         else:
             raise Exception("Unsupported model: [%s]" % model_name)
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     dataset = Imagenet()
 
     X, Y = dataset.get_test_dataset()
-    model = dataset.load_model_by_name('mobilenet')
+    model = dataset.load_model_by_name('resnet')
 
 
     

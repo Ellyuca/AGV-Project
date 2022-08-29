@@ -7,11 +7,11 @@ from tensorflow.keras.preprocessing import image
 VGG_MEAN = [103.939, 116.779, 123.68] # ?
 from PIL import Image
 
-from .mobilenet_model import MobileNet_model
-def keras_mobilenet_model():
+from .resnet_model import ResNet_model
+def keras_resnet_model():
     input_shape = (224, 224, 3)
     
-    model = MobileNet_model(input_shape=input_shape)
+    model = ResNet_model(input_shape=input_shape)
     return model
     
 if __name__ == '__main__':

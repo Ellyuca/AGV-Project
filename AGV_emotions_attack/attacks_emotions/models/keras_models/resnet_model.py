@@ -25,7 +25,7 @@ def MobileNet_model(input_shape):
   return model
 '''
 
-def MobileNet_model(input_shape):
+def ResNet_model(input_shape):
   inputs = tf.keras.Input(shape=input_shape)
   x = tf.keras.applications.resnet50.preprocess_input(inputs*255)
 
