@@ -1,0 +1,10 @@
+Domande e dubbi principali:
+- Dove e quale funzione applica i filtri?
+    - Esiste solo quella funzione?  (ho notato che ci sono più apply)
+    - La funzione viene utilizzata anche per altri scopi? (per valutazione o altro)
+
+- Esempio di applicazione su test
+    - Ovviamente in seguito potrei fare più lavoro di pulizia e thresholding adattivo sull'immagine
+
+Altri problemi in seguito:
+    - Alcune cose sono fatte in pytorch e altre con keras

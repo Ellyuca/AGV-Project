@@ -1,6 +1,38 @@
 import copy
 import random
 
+
+###
+import argparse
+import cv2
+import numpy as np
+import torch
+from torchvision import models
+from pytorch_grad_cam import GradCAM,HiResCAM, \
+    ScoreCAM, \
+    GradCAMPlusPlus, \
+    AblationCAM, \
+    XGradCAM, \
+    EigenCAM, \
+    EigenGradCAM, \
+    LayerCAM, \
+    FullGrad, \
+    GradCAMElementWise
+    
+
+from pytorch_grad_cam import GuidedBackpropReLUModel
+from pytorch_grad_cam.utils.image import show_cam_on_image, \
+    deprocess_image, \
+    preprocess_image
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+
+
+
+import matplotlib.pyplot as plt
+###
+
+
+
 class Individual(object):
 
     def __init__(self, 
@@ -25,6 +57,36 @@ class Individual(object):
         ilast = 0
         for fid in self.genotype:
             ifilter = self.filters[fid]
+            '''
+            ###
+            plt.imshow(image)
+            plt.show()
+            modello = models.resnet50(pretrained=True)
+            #provo a modificare solo la parte con gradcam
+            target_layers = [modello.layer4]
+            original_image = np.float32(image)
+            input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            cam_algorithm = GradCAM
+            targets = 65
+            with cam_algorithm(model = modello, target_layers = target_layers) as cam:
+                cam.batch_size = 32
+                grayscale_cam = cam(input_tensor=input_tensor, targets=None)
+
+                # Here grayscale_cam has only one image in the batch
+                grayscale_cam = grayscale_cam[0, :]
+                mask = grayscale_cam * 255  #make range between 0-255
+            
+            plt.imshow(mask)
+            plt.show()
+            retval, img_thresh = cv2.threshold(mask, 80, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
+            mask = img_thresh.astype(np.uint8)
+
+            img_applied_mask = cv2.bitwise_and(image, image, mask = mask)   #seziono l'immagine modificata con la maschera
+            plt.imshow(img_applied_mask)
+            plt.show()
+            ###
+            '''
+
             image = ifilter(image,*params[ilast:ilast+ifilter.nparams()])
             ilast += ifilter.nparams()
         return image

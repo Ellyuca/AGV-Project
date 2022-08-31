@@ -25,32 +25,18 @@ def MobileNet_model(input_shape):
   return model
 '''
 
-def ResNet_model(input_shape):
+def ResNet_model(input_shape, download_model = False):
   inputs = tf.keras.Input(shape=input_shape)
   x = tf.keras.applications.resnet50.preprocess_input(inputs*255)
 
-  core = tf.keras.applications.ResNet50()
+  core = tf.keras.applications.ResNet50(weights=None)
   x = core(x)
 
-  model = tf.keras.Model(inputs=[inputs], outputs=[x])
+  model = tf.keras.Model(inputs=[inputs], outputs=[x], name='resnet50')
+  
+  if download_model:
+    model.save_weights(os.path.join(pathlib.Path(__file__).parent.absolute(), "../resnet50_weights/keras_resnet50_weights.h5"))
+  else:
+    model.load_weights(os.path.join(pathlib.Path(__file__).parent.absolute(), "../resnet50_weights/keras_resnet50_weights.h5"))
 
   return model
-
-'''
-def EMO_MobileNetV2_model(input_shape): #OLD MODEL DEFINITION
-
-  base_model = MobileNetV2(weights=None, include_top=False, pooling='avg')
-
-  inputs = tensorflow.keras.Input(shape=input_shape)
-  x = preprocess_mobilenetv2(inputs*255)
-  network = base_model(x)
-  network = tensorflow.keras.layers.Dense(128, activation="relu")(network)
-  network = tensorflow.keras.layers.Dropout(.5)(network)
-  outputs = tensorflow.keras.layers.Dense(8, activation = tensorflow.keras.activations.softmax)(network)
-
-  EMO_MobileNetV2_model = tensorflow.keras.Model(inputs, outputs, name='emo_mobilenet_v2')
-  EMO_MobileNetV2_model.load_weights(os.path.join(pathlib.Path(__file__).parent.absolute(), 
-                          "../emo_weights/Emotion_MobileNetV2_weights.h5"))
-
-  return EMO_MobileNetV2_model
-'''

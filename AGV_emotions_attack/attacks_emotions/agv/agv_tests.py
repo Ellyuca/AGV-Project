@@ -178,22 +178,23 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     blank_image.save(P_tt.format(image_id,p1,p2))
     
     modified_image = cv2.imread(P_t.format(image_id), 1)    #prendo immagine creata con filtro applicato
-    model = models.resnet50(pretrained=True)
+    model = models.resnet50(weights='ResNet50_Weights.IMAGENET1K_V1')
     target_layers = [model.layer4]
     original_image = np.float32(X[image_id])
     input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
+    targets = [ClassifierOutputTarget(image_id)]
     cam_algorithm = GradCAM
 
     with cam_algorithm(model = model, target_layers = target_layers) as cam:
         cam.batch_size = 32
-        grayscale_cam = cam(input_tensor=input_tensor, targets=None)
+        grayscale_cam = cam(input_tensor=input_tensor, targets=targets)
 
         # Here grayscale_cam has only one image in the batch
         grayscale_cam = grayscale_cam[0, :]
         mask = grayscale_cam * 255  #make range between 0-255
     
-    retval, img_thresh = cv2.threshold(mask, 80, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
+    _, img_thresh = cv2.threshold(mask, 80, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
     mask = img_thresh.astype(np.uint8)
 
     img_applied_mask = cv2.bitwise_and(modified_image, modified_image, mask = mask)   #seziono l'immagine modificata con la maschera
@@ -208,14 +209,4 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     img_foreground = img_foreground.astype(np.uint8)
 
     result = cv2.add(img_applied_mask, img_foreground[:, :, ::-1])
-    cv2.imwrite(P+'/gradcam.jpeg', result)
-
-
-
-
-
-
-
-
-
-
+    cv2.imwrite(P+'/gradcam'+str(image_id)+'.jpeg', result)

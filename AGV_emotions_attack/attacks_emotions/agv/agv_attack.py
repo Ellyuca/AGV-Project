@@ -19,7 +19,9 @@ from agv_datasets import database_and_model
 from agv_distances import get_distance_functions
 from agv_metrics import compute_metricts
 
-from agv_tests import test, test_fits, save_adv_ex  
+from agv_tests import *
+#from agv_tests import test, test_fits, save_adv_ex
+
 from agv_tests import mkdir_p, save_adv_best
 from log import Log
 

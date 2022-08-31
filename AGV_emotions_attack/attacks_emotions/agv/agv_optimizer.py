@@ -14,6 +14,7 @@ from nsga2 import nsga_2_pass,dominates
 from agv_individual import Individual
 from agv_model_loader import ModelLoader
 
+import matplotlib.pyplot as plt
 
 import json
 
@@ -478,7 +479,13 @@ class AGVOptimizer(object):
                     best = self._pbest if self.use_elitims \
                     else self.population[int(len(self.population)/2)] if self.selection_type == "pareto" \
                     else self.population[0]
-                    Xf = np.array([best.apply(X[i]) for i in range(X.shape[0])])
+
+                    #plt.imshow(X[i])
+                    #plt.show()
+                    Xf = np.array([best.apply(X[i]) for i in range(X.shape[0])])    #l'immagine viene modificata qui?
+                    #plt.imshow(best.apply(X[i]))
+                    #plt.show()
+
                     fits = self.fitness(Xf, X, Y)
                     if type(fits) == float: #it is attack rate
                         fitsfile.write("{}\n".format(1.0-fits))
