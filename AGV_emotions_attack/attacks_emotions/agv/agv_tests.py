@@ -194,7 +194,8 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
         grayscale_cam = grayscale_cam[0, :]
         mask = grayscale_cam * 255  #make range between 0-255
     
-    _, img_thresh = cv2.threshold(mask, 80, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
+    _, img_thresh = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
+    plt.imshow(img_thresh)
     mask = img_thresh.astype(np.uint8)
 
     img_applied_mask = cv2.bitwise_and(modified_image, modified_image, mask = mask)   #seziono l'immagine modificata con la maschera

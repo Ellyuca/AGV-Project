@@ -2,9 +2,28 @@ Domande e dubbi principali:
 - Dove e quale funzione applica i filtri?
     - Esiste solo quella funzione?  (ho notato che ci sono più apply)
     - La funzione viene utilizzata anche per altri scopi? (per valutazione o altro)
+    - 
 
 - Esempio di applicazione su test
     - Ovviamente in seguito potrei fare più lavoro di pulizia e thresholding adattivo sull'immagine
 
 Altri problemi in seguito:
     - Alcune cose sono fatte in pytorch e altre con keras
+    - altri miglioramenti possono essere ad esempio utilizzando il segmentation dell'immagine
+
+
+Buongiorno, scrivo per dare degli aggiornamenti.
+Nell'immagine in allegato è presente un esempio di come ho pensato di utilizzare il sistema grad-cam.
+Nella prima immagine:
+- a sinistra: immagine originale
+- a destra: immagine generata dopo l'attacco
+Nella seconda immagine:
+- applico i filtri alla sola zona di interesse.
+
+Specifico che l'immagine è stata costruita svolgendo l'attacco e poi applicando i filtri alla sola area di interesse.
+Il meccanismo che ho utilizzato, e che ho intenzione di utilizzare anche nel sistema di attacco è il seguente:
+- creo una maschera con quello che si ottiene da grad-cam (attualmente ho usato un thresholding fisso e molto basso solo per fare delle prove ma potrebbe migliorare utilizzando un thresholding più forte oppure adattivo)
+- applico la sequenza di filtri ottenuta dall'attacco all'immagine originale ma solo nell'area della maschera
+
+L'intento è quello di utilizzare questo procedimento andando ad applicare i filtri alla sola area di interesse durante l'attacco, ma per farlo avrei bisgno di alcuni chiarimenti da parte della dottoressa Baia sulle funzioni utilizzate (quelle che applicano i filtri ecc...).
+Potrei provare a porre le mie domande qui in chat oppure non so se è preferibile direttamente una call di aggiornamento.
