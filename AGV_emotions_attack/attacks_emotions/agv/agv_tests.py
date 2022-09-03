@@ -183,7 +183,7 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     original_image = np.float32(X[image_id])
     input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-    targets = [ClassifierOutputTarget(image_id)]
+    targets = [ClassifierOutputTarget(67)]
     cam_algorithm = GradCAM
 
     with cam_algorithm(model = model, target_layers = target_layers) as cam:
@@ -193,14 +193,17 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
         # Here grayscale_cam has only one image in the batch
         grayscale_cam = grayscale_cam[0, :]
         mask = grayscale_cam * 255  #make range between 0-255
+        plt.imshow(mask, cmap='gray')
+        plt.show()
     
-    _, img_thresh = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
-    plt.imshow(img_thresh)
+    _, img_thresh = cv2.threshold(mask, 230, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
+    plt.imshow(img_thresh, cmap='gray')
+    plt.show()
     mask = img_thresh.astype(np.uint8)
 
     img_applied_mask = cv2.bitwise_and(modified_image, modified_image, mask = mask)   #seziono l'immagine modificata con la maschera
-    #plt.imshow(img_applied_mask[:, :, ::-1])
-    #plt.show()
+    plt.imshow(img_applied_mask[:, :, ::-1])
+    plt.show()
 
     #filtered_img = cv2.imread(P_t.format(image_id), 1)
     #filtered_img = cv2.bitwise_and(filtered_img, filtered_img, mask = mask)
