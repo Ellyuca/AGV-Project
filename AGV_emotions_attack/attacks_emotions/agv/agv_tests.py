@@ -196,7 +196,7 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
         plt.imshow(mask, cmap='gray')
         plt.show()
     
-    _, img_thresh = cv2.threshold(mask, 230, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
+    _, img_thresh = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
     plt.imshow(img_thresh, cmap='gray')
     plt.show()
     mask = img_thresh.astype(np.uint8)

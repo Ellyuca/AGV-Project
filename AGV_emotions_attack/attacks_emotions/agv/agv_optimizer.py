@@ -480,11 +480,11 @@ class AGVOptimizer(object):
                     else self.population[int(len(self.population)/2)] if self.selection_type == "pareto" \
                     else self.population[0]
 
-                    #plt.imshow(X[i])
-                    #plt.show()
+                    plt.imshow(X[i])
+                    plt.show()
                     Xf = np.array([best.apply(X[i]) for i in range(X.shape[0])])    #l'immagine viene modificata qui?
-                    #plt.imshow(best.apply(X[i]))
-                    #plt.show()
+                    plt.imshow(best.apply(X[i]))
+                    plt.show()
 
                     fits = self.fitness(Xf, X, Y)
                     if type(fits) == float: #it is attack rate
