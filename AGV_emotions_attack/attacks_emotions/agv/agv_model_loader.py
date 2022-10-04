@@ -25,7 +25,7 @@ class ModelLoader(object):
             json.dump(jmodel, jfile, indent=4)
         return self
     
-    def apply(self,X):
+    def apply(self,X):#??????????????
         ilast = 0 
         image = X
         for fid in self.model["filters"]:

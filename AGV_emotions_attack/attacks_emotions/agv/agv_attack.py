@@ -95,16 +95,16 @@ def main(dataset_name,
                               logs_path = logs_path,
                               save_state=(training_state, model_name, params_to_save)
                             )
-          print(X[i:i+1].shape, X[i:i+1].mean(), "original class:", Y[i:i+1], np.argmax(Y[i:i+1]), ", predicted class:", np.argmax(model_one.predict(X[i:i+1])))
-          best_ind = opt.fit(X[i:i+1], Y[i:i+1], batch_size, epochs)
-          
-          best.append(best_ind)              
-
           OG_class = np.argmax(model_one.predict(X[i:i+1]))
+          print(X[i:i+1].shape, X[i:i+1].mean(), "original class:", Y[i:i+1], np.argmax(Y[i:i+1]), ", predicted class:", OG_class)
+          best_ind = opt.fit(X[i:i+1], Y[i:i+1], batch_size, epochs, OG_class)
+          
+          best.append(best_ind)
           print("class of original image: ", OG_class )
           X_modified_with_best = np.array(best_ind.apply(X[i]))
           plt.imshow(X_modified_with_best)
           plt.show()
+
           X_modified_with_best =  np.expand_dims(X_modified_with_best, axis=0)
           
           MOD_class = np.argmax(model_one.predict(X_modified_with_best))

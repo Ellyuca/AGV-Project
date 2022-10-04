@@ -34,10 +34,10 @@ class Individual(object):
         self.fitness = fitness_max
     
 
-    def gradcam_operations(self, image):
+    def gradcam_operations(self, image, OG_class=None):
         original_image = np.float32(image)
         input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        targets = [ClassifierOutputTarget(67)]
+        targets = [ClassifierOutputTarget(OG_class)] if OG_class != None else None
         cam_algorithm = GradCAM
         with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS) as cam:
             cam.batch_size = 32
@@ -60,12 +60,12 @@ class Individual(object):
         return mask, img_applied_mask, img_foreground
 
 
-    def apply_gradcam(self, image, params = None):
+    def apply(self, image, params = None, OG_class=None):
         if params is None:
             params = self.params
         ilast = 0
 
-        mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
+        mask, img_applied_mask, img_foreground = self.gradcam_operations(image, OG_class)
         
         for fid in self.genotype:
             ifilter = self.filters[fid]
@@ -84,7 +84,7 @@ class Individual(object):
         #plt.show()
         return image
 
-
+    '''
     def apply(self, image, params = None):
         if params is None:
             params = self.params
@@ -95,7 +95,7 @@ class Individual(object):
             ilast += ifilter.nparams()
 
         return image
-
+    '''
     def change(self, i, j, rand_params = False):
         p_i = 0
         for p in range(i):
