@@ -102,7 +102,9 @@ def main(dataset_name,
 
           OG_class = np.argmax(model_one.predict(X[i:i+1]))
           print("class of original image: ", OG_class )
-          X_modified_with_best = np.array(best_ind.apply(X[i]))         
+          X_modified_with_best = np.array(best_ind.apply(X[i]))
+          plt.imshow(X_modified_with_best)
+          plt.show()
           X_modified_with_best =  np.expand_dims(X_modified_with_best, axis=0)
           
           MOD_class = np.argmax(model_one.predict(X_modified_with_best))
