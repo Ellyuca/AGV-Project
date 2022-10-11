@@ -155,62 +155,27 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     print("Starting saving best" )
     print(dataset_name, "size:", X.shape[0], "network name: ", nn_model.name)  
 
+    p1 = predict_image(nn_model, X[image_id])
+    p2 = predict_image(nn_model, best_model.apply(X[image_id], OG_class=p1))
+
     P = (os.path.splitext(best_folder)[0]).split("/")[-2]  
     mkdir_p(P)
     P = os.path.join(P, "generated_best_images")
     mkdir_p(P) 
     P_t = os.path.join(P,"best_img{}_.png")
     blank_image = Image.new("RGB",(224,224))
-    blank_image.paste(_to_pil_image(best_model.apply(X[image_id]))) 
+    blank_image.paste(_to_pil_image(best_model.apply(X[image_id], OG_class=p1))) 
     draw = ImageDraw.Draw(blank_image)                
     blank_image.save(P_t.format(image_id))
 
-    p1 = predict_image(nn_model, X[image_id])
-    p2 = predict_image(nn_model, best_model.apply(X[image_id]))
+    #p1 = predict_image(nn_model, X[image_id])
+    #p2 = predict_image(nn_model, best_model.apply(X[image_id]))
 
     P_tt = os.path.join(P,"OG_vs_best_img{}_{}_{}.png")
     blank_image = Image.new("RGB",(X.shape[1]*2+3,X.shape[2]+2))
     blank_image.paste(_to_pil_image(X[image_id]),(1,1)) 
-    blank_image.paste(_to_pil_image(best_model.apply(X[image_id])),(X.shape[1]+2,1)) 
+    blank_image.paste(_to_pil_image(best_model.apply(X[image_id], OG_class=p1)),(X.shape[1]+2,1)) 
     draw = ImageDraw.Draw(blank_image)
     draw.text((0, 0), "{}".format(p1), (255, 0, 0))
     draw.text((X.shape[1]+1, 0), "{}".format(p2), (255, 0, 0))
     blank_image.save(P_tt.format(image_id,p1,p2))
-    
-    modified_image = cv2.imread(P_t.format(image_id), 1)    #prendo immagine creata con filtro applicato
-    model = models.resnet50(weights='ResNet50_Weights.IMAGENET1K_V1')
-    target_layers = [model.layer4]
-    original_image = np.float32(X[image_id])
-    input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
-    targets = [ClassifierOutputTarget(67)]
-    cam_algorithm = GradCAM
-
-    with cam_algorithm(model = model, target_layers = target_layers) as cam:
-        cam.batch_size = 32
-        grayscale_cam = cam(input_tensor=input_tensor, targets=targets)
-
-        # Here grayscale_cam has only one image in the batch
-        grayscale_cam = grayscale_cam[0, :]
-        mask = grayscale_cam * 255  #make range between 0-255
-        plt.imshow(mask, cmap='gray')
-        plt.show()
-    
-    _, img_thresh = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY) #threshold alla maschera per filtrare la zona focale
-    plt.imshow(img_thresh, cmap='gray')
-    plt.show()
-    mask = img_thresh.astype(np.uint8)
-
-    img_applied_mask = cv2.bitwise_and(modified_image, modified_image, mask = mask)   #seziono l'immagine modificata con la maschera
-    plt.imshow(img_applied_mask[:, :, ::-1])
-    plt.show()
-
-    #filtered_img = cv2.imread(P_t.format(image_id), 1)
-    #filtered_img = cv2.bitwise_and(filtered_img, filtered_img, mask = mask)
-
-    img_logo_mask_inv = cv2.bitwise_not(mask)
-    img_foreground = cv2.bitwise_and(original_image, original_image, mask = img_logo_mask_inv) *255
-    img_foreground = img_foreground.astype(np.uint8)
-
-    result = cv2.add(img_applied_mask, img_foreground[:, :, ::-1])
-    cv2.imwrite(P+'/gradcam'+str(image_id)+'.jpeg', result)

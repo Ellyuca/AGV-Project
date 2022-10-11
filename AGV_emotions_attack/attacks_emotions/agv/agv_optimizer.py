@@ -81,7 +81,7 @@ class ParamerESOptimizer(object):
     def _evaluate(self, n, X, Y, P):
         R = np.zeros(len(P)) 
         for p in range(len(P)):
-            _Xf = np.array([n.apply(X[i], P[p]) for i in range(X.shape[0])])#???????????????????????????
+            _Xf = np.array([n.apply(X[i], P[p]) for i in range(X.shape[0])])
             R[p] = self.fitness(_Xf, X, Y)    
             del _Xf
         return R
@@ -131,7 +131,7 @@ class PatamerGAOptimizer(object):
         return x[0:index] + y[index:]
 
     def eval_params(self, n, X, Y, P):
-        Xf = np.array([n.apply(X[i], P) for i in range(X.shape[0])])#?????????????????
+        Xf = np.array([n.apply(X[i], P) for i in range(X.shape[0])])
         return self.fitness(Xf, X, Y)
 
     def crossover(self):
@@ -314,7 +314,7 @@ class AGVOptimizer(object):
             self.selection_type = "ranking"
 
     def evaluate(self, n, X, Y):
-        Xf = np.array([n.apply(X[i]) for i in range(X.shape[0])])#???????????????????????????????????
+        Xf = np.array([n.apply(X[i]) for i in range(X.shape[0])])
         return self.fitness( Xf, X, Y )
     
     def evaluate_set(self, set_to_eval, X, Y):       
@@ -454,7 +454,7 @@ class AGVOptimizer(object):
         optimizer_state.fitness = fitness
         return optimizer_state
         
-    def fit(self, X, Y, batch, epoch = 5, OG_class = None):
+    def fit(self, X, Y, batch, epoch = 5):
         self._first = self._last_epoch == 0
         P = os.path.splitext(self.model_path)[0]
         P = os.path.join(P, "logs_txts")
@@ -467,7 +467,7 @@ class AGVOptimizer(object):
                 s_i = i * batch
                 e_i = (i+1) * batch
                 batch_X, batch_Y = X[s_i:e_i], Y[s_i:e_i]                
-                self.fit_pass(batch_X, batch_Y)#####???????????????????????????????
+                self.fit_pass(batch_X, batch_Y)
                 logs.log("{}\t{}\t".format(e,i) + "\t".join(["{},{},{}".format(str(p.genotype),str(p.params),str(p.fitness)) for p in self.population]))
                 del batch_X, batch_Y           
 
@@ -480,22 +480,8 @@ class AGVOptimizer(object):
                     else self.population[int(len(self.population)/2)] if self.selection_type == "pareto" \
                     else self.population[0]
 
-                    Xf = np.array([best.apply(X[i], OG_class=OG_class) for i in range(X.shape[0])])  
+                    Xf = np.array([best.apply(X[i]) for i in range(X.shape[0])])
                     fits = self.fitness(Xf, X, Y)
-
-                    #Xf_gradcam = np.array([best.apply_gradcam(X[i]) for i in range(X.shape[0])])
-                    #fits_gradcam = self.fitness(Xf_gradcam, X, Y)
-                    #plt.imshow(Xf_gradcam[0])
-                    #plt.show()
-
-                    #Xf_black = np.zeros(Xf.shape)
-                    #fits_black = self.fitness(Xf_black, X, Y)
-
-                    #print()
-                    #print('fits: ', fits)
-                    #print('fits_gradcam: ', fits_gradcam)
-                    #print('fits_black: ', fits_black)
-                    #print()
 
                     if type(fits) == float: #it is attack rate
                         fitsfile.write("{}\n".format(1.0-fits))

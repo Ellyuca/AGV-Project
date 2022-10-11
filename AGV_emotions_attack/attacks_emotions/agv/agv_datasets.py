@@ -66,7 +66,7 @@ def database_and_model():
     return {
 
         'IMAGENET-RESNET' : [
-            DatasetSubset(Imagenet, nsamples = 1, start_nsamples=5),
+            DatasetSubset(Imagenet, nsamples = 10, start_nsamples=0),
             'resnet',       
         ],            
 
