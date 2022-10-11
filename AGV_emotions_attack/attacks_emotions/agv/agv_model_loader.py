@@ -40,7 +40,9 @@ class ModelLoader(object):
         return self
     
 
-    def gradcam_operations(self, image, OG_class=None):
+    def gradcam_operations(self, image):
+        OG_class = None #for now is None
+        
         original_image = np.float32(image)
         input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         targets = [ClassifierOutputTarget(OG_class)] if OG_class != None else None
@@ -66,11 +68,11 @@ class ModelLoader(object):
         return mask, img_applied_mask, img_foreground
 
 
-    def apply(self, image, OG_class=None):
-        ilast = 0 
+    def apply(self, image):
+        ilast = 0
+
+        mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
         
-        mask, img_applied_mask, img_foreground = self.gradcam_operations(image, OG_class)
-                
         for fid in self.model["filters"]:
             ifilter = self.model["filters_data"][fid]
             image = ifilter(image,*self.model["params"][ilast:ilast+ifilter.nparams()])
@@ -81,7 +83,9 @@ class ModelLoader(object):
             #plt.imshow(img_applied_mask)
             #plt.show()
 
-            image = cv2.add(img_applied_mask,img_foreground)
+            image = cv2.add(img_applied_mask, img_foreground)
+            #plt.imshow(image)
+            #plt.show()
             ilast += ifilter.nparams()
 
         #plt.imshow(image)
