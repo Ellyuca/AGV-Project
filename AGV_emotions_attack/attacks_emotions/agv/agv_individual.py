@@ -1,19 +1,7 @@
 import copy
 import random
 
-###
-import cv2
-import numpy as np
-from torchvision import models
-#from agv_attack import MODEL_gradcam, TARGET_LAYERS
-MODEL_gradcam = models.resnet50(weights='ResNet50_Weights.IMAGENET1K_V1')
-TARGET_LAYERS = [MODEL_gradcam.layer4]
-from pytorch_grad_cam import GradCAM  
-from pytorch_grad_cam import GuidedBackpropReLUModel
-from pytorch_grad_cam.utils.image import preprocess_image
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-import matplotlib.pyplot as plt
-###
+from agv_gradcam_utils import *
 
 class Individual(object):
 
@@ -48,7 +36,6 @@ class Individual(object):
             # Here grayscale_cam has only one image in the batch
             grayscale_cam = grayscale_cam[0, :]
             mask = grayscale_cam * 255  #make range between 0-255
-
         
         _, img_thresh = cv2.threshold(mask, 170, 255, cv2.THRESH_BINARY)
         mask = img_thresh.astype(np.uint8) #convert to uint8 for use in bitwise_and
@@ -56,11 +43,7 @@ class Individual(object):
         img_logo_mask_inv = cv2.bitwise_not(mask)
         img_foreground = cv2.bitwise_and(image, image, mask = img_logo_mask_inv)
 
-        #plt.imshow(img_applied_mask, cmap='gray')
-        #plt.show()
-
         return mask, img_applied_mask, img_foreground
-
 
     def apply(self, image, params = None):
         if params is None:
@@ -71,35 +54,15 @@ class Individual(object):
         
         for fid in self.genotype:
             ifilter = self.filters[fid]
+            # gradcam filters application
             image = ifilter(image,*params[ilast:ilast+ifilter.nparams()])
-            #plt.imshow(image)
-            #plt.show()
-
             img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
-            #plt.imshow(img_applied_mask)
-            #plt.show()
-
             image = cv2.add(img_applied_mask, img_foreground)
-            #plt.imshow(image)
-            #plt.show()
-            ilast += ifilter.nparams()
 
-        #plt.imshow(image)
-        #plt.show()
-        return image
-
-    '''
-    def apply(self, image, params = None):
-        if params is None:
-            params = self.params
-        ilast = 0
-        for fid in self.genotype:
-            ifilter = self.filters[fid]
-            image = ifilter(image,*params[ilast:ilast+ifilter.nparams()])
             ilast += ifilter.nparams()
 
         return image
-    '''
+
     def change(self, i, j, rand_params = False):
         p_i = 0
         for p in range(i):

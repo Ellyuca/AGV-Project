@@ -15,37 +15,8 @@ from agv_metrics import compute_metricts
 import pandas as pd
 import tensorflow as tf
 
-
-
-
-###
-import argparse
-import cv2
-import numpy as np
-import torch
-from torchvision import models
-from pytorch_grad_cam import GradCAM,HiResCAM, \
-    ScoreCAM, \
-    GradCAMPlusPlus, \
-    AblationCAM, \
-    XGradCAM, \
-    EigenCAM, \
-    EigenGradCAM, \
-    LayerCAM, \
-    FullGrad, \
-    GradCAMElementWise
-    
-
-from pytorch_grad_cam import GuidedBackpropReLUModel
-from pytorch_grad_cam.utils.image import show_cam_on_image, \
-    deprocess_image, \
-    preprocess_image
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-
-
-
 import matplotlib.pyplot as plt
-###
+
 
 # load classes json data
 json_file = open(os.path.join(os.path.join(pathlib.Path(__file__).parent.absolute(), 
@@ -153,10 +124,7 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     nn_model, X, Y = build_model_and_dataset(dataset_name)
     best_model =  ModelLoader().load(os.path.join(best_folder, best_files[image_id]))
     print("Starting saving best" )
-    print(dataset_name, "size:", X.shape[0], "network name: ", nn_model.name)  
-
-    p1 = predict_image(nn_model, X[image_id])
-    p2 = predict_image(nn_model, best_model.apply(X[image_id], OG_class=p1))
+    print(dataset_name, "size:", X.shape[0], "network name: ", nn_model.name)
 
     P = (os.path.splitext(best_folder)[0]).split("/")[-2]  
     mkdir_p(P)
@@ -164,17 +132,17 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     mkdir_p(P) 
     P_t = os.path.join(P,"best_img{}_.png")
     blank_image = Image.new("RGB",(224,224))
-    blank_image.paste(_to_pil_image(best_model.apply(X[image_id], OG_class=p1))) 
+    blank_image.paste(_to_pil_image(best_model.apply(X[image_id]))) 
     draw = ImageDraw.Draw(blank_image)                
     blank_image.save(P_t.format(image_id))
 
-    #p1 = predict_image(nn_model, X[image_id])
-    #p2 = predict_image(nn_model, best_model.apply(X[image_id]))
+    p1 = predict_image(nn_model, X[image_id])
+    p2 = predict_image(nn_model, best_model.apply(X[image_id]))
 
     P_tt = os.path.join(P,"OG_vs_best_img{}_{}_{}.png")
     blank_image = Image.new("RGB",(X.shape[1]*2+3,X.shape[2]+2))
     blank_image.paste(_to_pil_image(X[image_id]),(1,1)) 
-    blank_image.paste(_to_pil_image(best_model.apply(X[image_id], OG_class=p1)),(X.shape[1]+2,1)) 
+    blank_image.paste(_to_pil_image(best_model.apply(X[image_id])),(X.shape[1]+2,1)) 
     draw = ImageDraw.Draw(blank_image)
     draw.text((0, 0), "{}".format(p1), (255, 0, 0))
     draw.text((X.shape[1]+1, 0), "{}".format(p2), (255, 0, 0))

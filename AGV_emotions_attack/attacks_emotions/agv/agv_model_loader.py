@@ -4,19 +4,7 @@ import copy
 import agv_individual
 import base64
 
-###
-import cv2
-import numpy as np
-from torchvision import models
-#from agv_attack import MODEL_gradcam, TARGET_LAYERS
-MODEL_gradcam = models.resnet50(weights='ResNet50_Weights.IMAGENET1K_V1')
-TARGET_LAYERS = [MODEL_gradcam.layer4]
-from pytorch_grad_cam import GradCAM  
-from pytorch_grad_cam import GuidedBackpropReLUModel
-from pytorch_grad_cam.utils.image import preprocess_image
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-import matplotlib.pyplot as plt
-###
+from agv_gradcam_utils import *
 
 class ModelLoader(object):
 
@@ -62,9 +50,6 @@ class ModelLoader(object):
         img_logo_mask_inv = cv2.bitwise_not(mask)
         img_foreground = cv2.bitwise_and(image, image, mask = img_logo_mask_inv)
 
-        #plt.imshow(img_applied_mask, cmap='gray')
-        #plt.show()
-
         return mask, img_applied_mask, img_foreground
 
 
@@ -75,21 +60,13 @@ class ModelLoader(object):
         
         for fid in self.model["filters"]:
             ifilter = self.model["filters_data"][fid]
+
             image = ifilter(image,*self.model["params"][ilast:ilast+ifilter.nparams()])
-            #plt.imshow(image)
-            #plt.show()
-
             img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
-            #plt.imshow(img_applied_mask)
-            #plt.show()
-
             image = cv2.add(img_applied_mask, img_foreground)
-            #plt.imshow(image)
-            #plt.show()
+
             ilast += ifilter.nparams()
 
-        #plt.imshow(image)
-        #plt.show()
         return image
 
     '''def apply(self,X):#???????????????

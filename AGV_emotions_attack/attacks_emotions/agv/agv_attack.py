@@ -42,6 +42,10 @@ def main(dataset_name,
          selection="ranking",
          logs_fitness = None,         
          params_to_save = {}):
+
+    #block seed
+    random.seed(42)
+    
     #get model and dataset
     model_one, X, Y = build_model_and_dataset(dataset_name)
     print("shape of X: ", X.shape)
