@@ -9,7 +9,9 @@ class Individual(object):
                  Nf,
                  filters, 
                  fitness_max,
-                 repetitions = True):
+                 repetitions = True,
+                 X = None):
+
         if repetitions:           
             self.genotype = [random.randrange(0, len(filters)) for _ in range(Nf)]        
         else:
@@ -20,14 +22,21 @@ class Individual(object):
             self.params += [d.value for d in self.filters[fid].domains]
         self.fitness_max = fitness_max
         self.fitness = fitness_max
+
+        self.gradcam_mask_dict = self.create_mask_dict(X)
+    
+
+    def create_mask_dict(self, X):
+        mask, img_applied_mask, img_foreground = self.gradcam_operations(X)
+        gradcam_mask_dict = {'mask': mask, 'img_applied_mask': img_applied_mask, 'img_foreground': img_foreground}
+        return gradcam_mask_dict
     
 
     def gradcam_operations(self, image):
-        OG_class = None #for now is None
-        
+        OG_class = None
         original_image = np.float32(image)
         input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        targets = [ClassifierOutputTarget(OG_class)] if OG_class != None else None
+        targets = OG_class
         cam_algorithm = GradCAM
         with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS) as cam:
             cam.batch_size = 32
@@ -50,8 +59,11 @@ class Individual(object):
             params = self.params
         ilast = 0
 
-        mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
-        
+        #mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
+        mask = self.gradcam_mask_dict['mask']
+        img_applied_mask = self.gradcam_mask_dict['img_applied_mask']
+        img_foreground = self.gradcam_mask_dict['img_foreground']
+
         for fid in self.genotype:
             ifilter = self.filters[fid]
             # gradcam filters application

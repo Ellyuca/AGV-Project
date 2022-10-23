@@ -242,7 +242,8 @@ class AGVOptimizer(object):
                  logs_fitness = None,
                  save_candidates = None,
                  logs_path = "stats.txt",
-                 save_state = None
+                 save_state = None,
+                 X = None
                  ):
 
         if  (not repetitions) and (len(filters) < Nf):
@@ -252,7 +253,8 @@ class AGVOptimizer(object):
         self.population = [Individual(Nf,
                                       filters,  
                                       fitness_max,
-                                      self.repetitions) for _ in range(NP)]
+                                      self.repetitions,
+                                      X) for _ in range(NP)]
         self.filters = filters
         self.fitness = fitness
         self.ga_domain = [0, len(filters)-1]
@@ -281,7 +283,6 @@ class AGVOptimizer(object):
         self._pbest = None
         self._first= True
 
-        
 
         #test        
         if  selection_type.find("pareto") >= 0:

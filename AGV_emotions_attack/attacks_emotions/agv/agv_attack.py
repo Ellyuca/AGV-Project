@@ -97,7 +97,8 @@ def main(dataset_name,
                               repetitions=repetitions,
                               logs_fitness=logs_fitness,                              
                               logs_path = logs_path,
-                              save_state=(training_state, model_name, params_to_save)
+                              save_state=(training_state, model_name, params_to_save),
+                              X = X[i]
                             )
           OG_class = np.argmax(model_one.predict(X[i:i+1]))
           print(X[i:i+1].shape, X[i:i+1].mean(), "original class:", Y[i:i+1], np.argmax(Y[i:i+1]), ", predicted class:", OG_class)
@@ -106,8 +107,6 @@ def main(dataset_name,
           best.append(best_ind)
           print("class of original image: ", OG_class )
           X_modified_with_best = np.array(best_ind.apply(X[i]))
-          #plt.imshow(X_modified_with_best)
-          #plt.show()
 
           X_modified_with_best =  np.expand_dims(X_modified_with_best, axis=0)
           
