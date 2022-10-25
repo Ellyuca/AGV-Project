@@ -31,6 +31,43 @@ class Individual(object):
         gradcam_mask_dict = {'mask': mask, 'img_applied_mask': img_applied_mask, 'img_foreground': img_foreground}
         return gradcam_mask_dict
     
+    def get_probabilistic_mask(self, grayscale_cam_mask, thresh_value, pct):
+        '''
+            Create a mask choosing probabilistically pixels from img_thresh with a percentage pct.
+            
+            params:
+            - grayscale_cam_mask: grayscale image computed by grad_cam
+            - thresh_value: value for BINARY threshold
+            - pct: percentage of pixels to get (from the ones with value 255) for probabilistic mask
+            
+            returns:
+            - new_mask: new img with selected pixels
+        '''
+        # Apply threshold
+        _ , img_thresh = cv2.threshold(grayscale_cam_mask, thresh_value, 255, cv2.THRESH_BINARY) 
+        mask = img_thresh.astype(np.uint8) #convert to uint8 for use in bitwise_and
+
+        # Number of pixels to choose based on percentage value
+        num_pixels = int(np.count_nonzero(mask > 0) / 100 * pct)
+
+        # Define a new mask with zero value for all pixels
+        new_mask = np.zeros(mask.shape)
+
+        # Flatten images and define flatten indeces
+        img_flat = mask.ravel()
+        indices = np.arange(len(img_flat))
+
+        # Normalize probability to sum 1 in order to choose only between pixels with value of 255
+        normalized_prob = normalize(mask.ravel().reshape(1, -1), axis=1, norm='l1',).ravel()
+
+        # Random sample
+        selected_pixels = np.column_stack(np.unravel_index(np.random.choice(indices, size=num_pixels, replace=False, p = normalized_prob), 
+                                                            shape=mask.shape))
+        # Apply in new mask the selected pixels
+        for pixel in selected_pixels:
+            new_mask[pixel[0], pixel[1]] = 255
+        
+        return new_mask
 
     def gradcam_operations(self, image):
         OG_class = None
@@ -46,8 +83,9 @@ class Individual(object):
             grayscale_cam = grayscale_cam[0, :]
             mask = grayscale_cam * 255  #make range between 0-255
         
-        _, img_thresh = cv2.threshold(mask, 170, 255, cv2.THRESH_BINARY)
-        mask = img_thresh.astype(np.uint8) #convert to uint8 for use in bitwise_and
+        #_, img_thresh = cv2.threshold(mask, 170, 255, cv2.THRESH_BINARY)
+        mask = self.get_probabilistic_mask(mask, thresh_value=155, pct=50)
+        mask = mask.astype(np.uint8) #convert to uint8 for use in bitwise_and
         img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
         img_logo_mask_inv = cv2.bitwise_not(mask)
         img_foreground = cv2.bitwise_and(image, image, mask = img_logo_mask_inv)
