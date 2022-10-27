@@ -23,10 +23,16 @@ class Individual(object):
         self.fitness_max = fitness_max
         self.fitness = fitness_max
 
+        
         self.gradcam_mask_dict = self.create_mask_dict(X)
     
 
     def create_mask_dict(self, X):
+        '''
+        Create a dict as class attribute to save mask (and other img) which are used in filters application.
+        These images are created for image X.
+        This is made to make execution faster. Otherwhise these imgs are regenerated every times.
+        '''
         mask, img_applied_mask, img_foreground = self.gradcam_operations(X)
         gradcam_mask_dict = {'mask': mask, 'img_applied_mask': img_applied_mask, 'img_foreground': img_foreground}
         return gradcam_mask_dict
@@ -70,6 +76,15 @@ class Individual(object):
         return new_mask
 
     def gradcam_operations(self, image):
+        '''
+        Method used to make 3 images: mask, img_applied_mask, img_foreground.
+        Start from an image, a grayscale_cam is calculated use GradCAM algorithm.
+        From this grayscale_cam, is calculated (the method depends ):
+        - mask -> area (pixels) where to apply filters (used as mask)
+        - img_applied_mask -> area from the original img where to apply filters
+        - img_foreground -> area where to not apply filters from the original img
+
+        '''
         OG_class = None
         original_image = np.float32(image)
         input_tensor = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -84,7 +99,7 @@ class Individual(object):
             mask = grayscale_cam * 255  #make range between 0-255
         
         #_, img_thresh = cv2.threshold(mask, 170, 255, cv2.THRESH_BINARY)
-        mask = self.get_probabilistic_mask(mask, thresh_value=155, pct=50)
+        mask = self.get_probabilistic_mask(mask, thresh_value=155, pct=50) #mask creation
         mask = mask.astype(np.uint8) #convert to uint8 for use in bitwise_and
         img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
         img_logo_mask_inv = cv2.bitwise_not(mask)

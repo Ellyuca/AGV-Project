@@ -29,6 +29,9 @@ class ModelLoader(object):
     
 
     def gradcam_operations(self, image):
+        '''
+        particular gradcam functions for test image generations.
+        '''
         OG_class = None #for now is None
         
         original_image = np.float32(image)
@@ -55,16 +58,13 @@ class ModelLoader(object):
 
     def apply(self, image):
         ilast = 0
-
-        mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
-        
+        mask, img_applied_mask, img_foreground = self.gradcam_operations(image)        
         for fid in self.model["filters"]:
             ifilter = self.model["filters_data"][fid]
-
+            #filters application
             image = ifilter(image,*self.model["params"][ilast:ilast+ifilter.nparams()])
             img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
             image = cv2.add(img_applied_mask, img_foreground)
-
             ilast += ifilter.nparams()
 
         return image
