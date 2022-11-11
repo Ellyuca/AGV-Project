@@ -15,7 +15,7 @@ from agv_metrics import compute_metricts
 import pandas as pd
 import tensorflow as tf
 
-import matplotlib.pyplot as plt
+#import cv2
 
 
 # load classes json data
@@ -132,7 +132,8 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
     mkdir_p(P) 
     P_t = os.path.join(P,"best_img{}_.png")
     blank_image = Image.new("RGB",(224,224))
-    blank_image.paste(_to_pil_image(best_model.apply(X[image_id]))) 
+    blank_image.paste(_to_pil_image(best_model.apply(X[image_id])))
+    #cv2.imwrite('TEST'+str(image_id)+'.png',best_model.apply(X[image_id])) #used to check selected pixels
     draw = ImageDraw.Draw(blank_image)                
     blank_image.save(P_t.format(image_id))
 

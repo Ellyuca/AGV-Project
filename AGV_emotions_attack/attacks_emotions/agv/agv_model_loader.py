@@ -79,7 +79,6 @@ class ModelLoader(object):
             image = cv2.add(img_applied_mask, img_foreground)
             ilast += ifilter.nparams()
 
-        #plt.imsave('TEST.png', image)
         return image
 
     def to_individual(self):

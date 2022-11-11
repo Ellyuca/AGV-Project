@@ -25,6 +25,8 @@ from agv_tests import *
 from agv_tests import mkdir_p, save_adv_best
 from log import Log
 
+#import cv2
+
 def main(dataset_name,
          model_path, 
          logs_path,
@@ -107,8 +109,7 @@ def main(dataset_name,
           best.append(best_ind)
           print("class of original image: ", OG_class )
           X_modified_with_best = np.array(best_ind.apply(X[i]))
-          #plt.imsave('TRAIN.png', X_modified_with_best)
-
+          #cv2.imwrite('TRAIN'+str(i)+'.png', X_modified_with_best) #used to check selected pixels
           X_modified_with_best =  np.expand_dims(X_modified_with_best, axis=0)
           
           MOD_class = np.argmax(model_one.predict(X_modified_with_best))
