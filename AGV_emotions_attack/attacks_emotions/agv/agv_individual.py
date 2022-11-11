@@ -13,7 +13,7 @@ class Individual(object):
                  X = None):
 
         if repetitions:           
-            self.genotype = [random.randrange(0, len(filters)) for _ in range(Nf)]        
+            self.genotype = [random.randrange(0, len(filters)) for _ in range(Nf)]
         else:
             self.genotype = random.sample(range(0, len(filters)), Nf) #
         self.params = []
@@ -23,7 +23,6 @@ class Individual(object):
         self.fitness_max = fitness_max
         self.fitness = fitness_max
 
-        
         self.gradcam_mask_dict = self.create_mask_dict(X)
     
 
@@ -33,11 +32,12 @@ class Individual(object):
         These images are created for image X.
         This is made to make execution faster. Otherwhise these imgs are regenerated every times.
         '''
-        mask, img_applied_mask, img_foreground = self.gradcam_operations(X)
-        gradcam_mask_dict = {'mask': mask, 'img_applied_mask': img_applied_mask, 'img_foreground': img_foreground}
+        mask, img_applied_mask, img_foreground, selected_pixels = self.gradcam_operations(X)
+        gradcam_mask_dict = {'mask': mask, 'img_applied_mask': img_applied_mask, 'img_foreground': img_foreground, 'selected_pixels': selected_pixels}
         return gradcam_mask_dict
     
-    def get_probabilistic_mask(self, grayscale_cam_mask, thresh_value, pct):
+
+    def get_probabilistic_mask(self, grayscale_cam_mask, thresh_value, pct, thresh_method):
         '''
             Create a mask choosing probabilistically pixels from img_thresh with a percentage pct.
             
@@ -50,7 +50,7 @@ class Individual(object):
             - new_mask: new img with selected pixels
         '''
         # Apply threshold
-        _ , img_thresh = cv2.threshold(grayscale_cam_mask, thresh_value, 255, cv2.THRESH_BINARY) 
+        _ , img_thresh = cv2.threshold(grayscale_cam_mask, thresh_value, 255, thresh_method) 
         mask = img_thresh.astype(np.uint8) #convert to uint8 for use in bitwise_and
 
         # Number of pixels to choose based on percentage value
@@ -64,26 +64,26 @@ class Individual(object):
         indices = np.arange(len(img_flat))
 
         # Normalize probability to sum 1 in order to choose only between pixels with value of 255
-        normalized_prob = normalize(mask.ravel().reshape(1, -1), axis=1, norm='l1',).ravel()
+        normalized_prob = normalize(mask.ravel().reshape(1, -1), axis=1, norm='l1').ravel()
 
         # Random sample
         selected_pixels = np.column_stack(np.unravel_index(np.random.choice(indices, size=num_pixels, replace=False, p = normalized_prob), 
                                                             shape=mask.shape))
         # Apply in new mask the selected pixels
         for pixel in selected_pixels:
-            new_mask[pixel[0], pixel[1]] = 255
+            new_mask[pixel[0], pixel[1]] = 255#need correction
         
-        return new_mask
+        return new_mask, selected_pixels
+
 
     def gradcam_operations(self, image):
         '''
         Method used to make 3 images: mask, img_applied_mask, img_foreground.
         Start from an image, a grayscale_cam is calculated use GradCAM algorithm.
         From this grayscale_cam, is calculated (the method depends ):
-        - mask -> area (pixels) where to apply filters (used as mask)
-        - img_applied_mask -> area from the original img where to apply filters
-        - img_foreground -> area where to not apply filters from the original img
-
+            - mask -> area (pixels) where to apply filters (used as mask)
+            - img_applied_mask -> area from the original img where to apply filters
+            - img_foreground -> area where to not apply filters from the original img
         '''
         OG_class = None
         original_image = np.float32(image)
@@ -99,19 +99,22 @@ class Individual(object):
             mask = grayscale_cam * 255  #make range between 0-255
         
         #_, img_thresh = cv2.threshold(mask, 170, 255, cv2.THRESH_BINARY)
-        mask = self.get_probabilistic_mask(mask, thresh_value=155, pct=50) #mask creation
+        Q_th_percentile = 80
+        thresh_value = np.percentile(mask, Q_th_percentile)
+        
+        mask, selected_pixels = self.get_probabilistic_mask(mask, thresh_value=thresh_value, pct=50, thresh_method=cv2.THRESH_BINARY) #mask creation
         mask = mask.astype(np.uint8) #convert to uint8 for use in bitwise_and
         img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
         img_logo_mask_inv = cv2.bitwise_not(mask)
         img_foreground = cv2.bitwise_and(image, image, mask = img_logo_mask_inv)
 
-        return mask, img_applied_mask, img_foreground
+        return mask, img_applied_mask, img_foreground, selected_pixels
+
 
     def apply(self, image, params = None):
         if params is None:
             params = self.params
         ilast = 0
-
         #mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
         mask = self.gradcam_mask_dict['mask']
         img_applied_mask = self.gradcam_mask_dict['img_applied_mask']
@@ -123,10 +126,10 @@ class Individual(object):
             image = ifilter(image,*params[ilast:ilast+ifilter.nparams()])
             img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
             image = cv2.add(img_applied_mask, img_foreground)
-
             ilast += ifilter.nparams()
 
         return image
+
 
     def change(self, i, j, rand_params = False):
         p_i = 0
