@@ -109,7 +109,6 @@ def main(dataset_name,
           best.append(best_ind)
           print("class of original image: ", OG_class )
           X_modified_with_best = np.array(best_ind.apply(X[i]))
-          #cv2.imwrite('TRAIN'+str(i)+'.png', X_modified_with_best) #used to check selected pixels
           X_modified_with_best =  np.expand_dims(X_modified_with_best, axis=0)
           
           MOD_class = np.argmax(model_one.predict(X_modified_with_best))
@@ -132,13 +131,6 @@ def main(dataset_name,
               "neural_network_model" : model_name,
               "in_params" : params_to_save,
           }).save(P_t)
-
-          #save selected pixels
-          P = os.path.splitext(model_path)[0]
-          P = os.path.join(P, "gradcam_mask_dict")
-          mkdir_p(P)
-          P_t = os.path.join(P,"img_" +  str(i)+ "_" + model_path)
-          ModelLoader().from_individual_dict(best_ind).save_dict(P_t)
           
         #saving best list to a file, just for future reference:
         class_info_df = pd.DataFrame.from_dict(prediction_on_bestind, orient='index').reset_index() 

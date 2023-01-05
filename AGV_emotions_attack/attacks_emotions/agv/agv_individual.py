@@ -23,58 +23,6 @@ class Individual(object):
         self.fitness_max = fitness_max
         self.fitness = fitness_max
 
-        self.gradcam_mask_dict = self.create_mask_dict(X)
-    
-
-    def create_mask_dict(self, X):
-        '''
-        Create a dict as class attribute to save mask (and other img) which are used in filters application.
-        These images are created for image X.
-        This is made to make execution faster. Otherwhise these imgs are regenerated every times.
-        '''
-        mask, img_applied_mask, img_foreground, selected_pixels = self.gradcam_operations(X)
-        gradcam_mask_dict = {'mask': mask, 'img_applied_mask': img_applied_mask, 'img_foreground': img_foreground, 'selected_pixels': selected_pixels}
-        return gradcam_mask_dict
-    
-
-    def get_probabilistic_mask(self, grayscale_cam_mask, thresh_value, pct, thresh_method):
-        '''
-            Create a mask choosing probabilistically pixels from img_thresh with a percentage pct.
-            
-            params:
-            - grayscale_cam_mask: grayscale image computed by grad_cam
-            - thresh_value: value for BINARY threshold
-            - pct: percentage of pixels to get (from the ones with value 255) for probabilistic mask
-            
-            returns:
-            - new_mask: new img with selected pixels
-        '''
-        # Apply threshold
-        _ , img_thresh = cv2.threshold(grayscale_cam_mask, thresh_value, 255, thresh_method) 
-        mask = img_thresh.astype(np.uint8) #convert to uint8 for use in bitwise_and
-
-        # Number of pixels to choose based on percentage value
-        num_pixels = int(np.count_nonzero(mask > 0) / 100 * pct)
-
-        # Define a new mask with zero value for all pixels
-        new_mask = np.zeros(mask.shape)
-
-        # Flatten images and define flatten indeces
-        img_flat = mask.ravel()
-        indices = np.arange(len(img_flat))
-
-        # Normalize probability to sum 1 in order to choose only between pixels with value of 255
-        normalized_prob = normalize(mask.ravel().reshape(1, -1), axis=1, norm='l1').ravel()
-
-        # Random sample
-        selected_pixels = np.column_stack(np.unravel_index(np.random.choice(indices, size=num_pixels, replace=False, p = normalized_prob), 
-                                                            shape=mask.shape))
-        # Apply in new mask the selected pixels
-        for pixel in selected_pixels:
-            new_mask[pixel[0], pixel[1]] = 255#need correction
-        
-        return new_mask, selected_pixels
-
 
     def gradcam_operations(self, image):
         '''
@@ -115,19 +63,10 @@ class Individual(object):
         if params is None:
             params = self.params
         ilast = 0
-        #mask, img_applied_mask, img_foreground = self.gradcam_operations(image)
-        mask = self.gradcam_mask_dict['mask']
-        img_applied_mask = self.gradcam_mask_dict['img_applied_mask']
-        img_foreground = self.gradcam_mask_dict['img_foreground']
-
         for fid in self.genotype:
             ifilter = self.filters[fid]
-            # gradcam filters application
             image = ifilter(image,*params[ilast:ilast+ifilter.nparams()])
-            img_applied_mask = cv2.bitwise_and(image, image, mask = mask)
-            image = cv2.add(img_applied_mask, img_foreground)
             ilast += ifilter.nparams()
-
         return image
 
 
