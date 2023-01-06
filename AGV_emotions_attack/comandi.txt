@@ -1,3 +1,0 @@
-docker build -t xai_aml_docker .
-
-docker run --gpus all -w /XAI_AML -v ${PWD}:/XAI_AML -it xaiprova:latest bash
