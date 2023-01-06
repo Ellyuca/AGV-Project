@@ -25,8 +25,6 @@ from agv_tests import *
 from agv_tests import mkdir_p, save_adv_best
 from log import Log
 
-#import cv2
-
 def main(dataset_name,
          model_path, 
          logs_path,
