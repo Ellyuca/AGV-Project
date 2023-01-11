@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import json
 
 from agv_tests import mkdir_p
+from agv_tests import get_cam
 
 import math 
 STATE_EXT = "state"
@@ -456,6 +457,11 @@ class AGVOptimizer(object):
         return optimizer_state
         
     def fit(self, X, Y, batch, epoch = 5):
+        #salvataggio cam per calcolarla solo una volta, da migliorare
+        cam_original_image = get_cam(X[0])
+        P = str(os.getcwd()) + "/img_cam/img_cam.png"
+        plt.imsave(P, cam_original_image, cmap='gray')
+
         self._first = self._last_epoch == 0
         P = os.path.splitext(self.model_path)[0]
         P = os.path.join(P, "logs_txts")

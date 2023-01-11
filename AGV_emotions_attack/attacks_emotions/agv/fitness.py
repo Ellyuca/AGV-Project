@@ -10,6 +10,7 @@ from functools import reduce
 import cv2
 
 from skimage.metrics import structural_similarity as ssim
+from agv_xai_utils import *
 
 #set modules path
 sys.path.append(os.path.dirname(__file__))
@@ -70,6 +71,28 @@ def ssim_score(X1,X2): #X1 is the Xf, X2 is the original; order shoudlnt matter 
   for sample in range(X1.shape[0]):     
     SSIM +=  ssim(X2[sample],X1[sample],data_range = 1, multichannel=True)
   return 1 - (SSIM / X1.shape[0])#if the two images are identical then the returned score will be zero; 1 otherwise
+
+
+def ssim_score_not_inv(X1, X2): #ssim to use with the explaination cam. It is not inverted beacuse we want to minimize it
+    #X1 is the Xf, X2 is the original
+    X2 = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
+
+    # original_image = np.float32(X2[0])
+    modified_image = np.float32(X1[0])
+    # input_tensor_original = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    input_tensor_modified = preprocess_image(modified_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    cam_algorithm = EigenCAM
+    with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
+        cam.batch_size = 128
+        # grayscale_cam_eigen_original = cam(input_tensor=input_tensor_original, targets=None)
+        grayscale_cam_eigen_modified = cam(input_tensor=input_tensor_modified, targets=None)
+
+        # Here grayscale_cam has only one image in the batch
+        # X2 = grayscale_cam_eigen_original[0, :]
+        X1 = grayscale_cam_eigen_modified[0, :]
+
+    SSIM = ssim(X2, X1, data_range = 1, multichannel=False)
+    return SSIM
 
   
 # Note: KL-divergence is not symentric.

@@ -7,6 +7,7 @@ from fitness import mean_norm_0
 from fitness import AutoNormalization
 from agv_compute_fid import ComputeFid
 from fitness import ssim_score
+from fitness import ssim_score_not_inv
 
 def get_distance_functions(dataset_name=None, model=None):
     if dataset_name is not None and model is not None: #to get names (main args)
@@ -20,4 +21,5 @@ def get_distance_functions(dataset_name=None, model=None):
         'fid':                        lambda Xf, X: float(cFid(Xf, X)),
         'fid_normalized':             lambda Xf, X: float(anFiD(cFid(Xf, X))),
         'ssim':                       lambda Xf, X: float(ssim_score(Xf,X)),
+        'ssim_not_inv':               lambda Xf, X: float(ssim_score_not_inv(Xf,X)),
     }

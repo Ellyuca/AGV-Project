@@ -15,13 +15,27 @@ from agv_metrics import compute_metricts
 import pandas as pd
 import tensorflow as tf
 
-#import cv2
+from agv_xai_utils import *
 
 
 # load classes json data
 json_file = open(os.path.join(os.path.join(pathlib.Path(__file__).parent.absolute(), 
                                       "../datasets/imagenet_class_index.json")))
 class_names = json.load(json_file)
+
+def get_cam(img):
+    img = np.float32(img)
+    input_tensor = preprocess_image(img, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    cam_algorithm = EigenCAM
+    with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
+        cam.batch_size = 32
+        grayscale_cam_eigen_original = cam(input_tensor=input_tensor, targets=None)
+        image_cam = grayscale_cam_eigen_original[0, :]
+    return image_cam
+
+def get_cam_on_image(rgb_img, cam):
+    cam_on_image = show_cam_on_image(rgb_img, cam, use_rgb=True)
+    return cam_on_image
 
 def one_sample_batch(image):
     batch = np.zeros(shape=(1,*image.shape))
@@ -142,9 +156,32 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
 
     P_tt = os.path.join(P,"OG_vs_best_img{}_{}_{}.png")
     blank_image = Image.new("RGB",(X.shape[1]*2+3,X.shape[2]+2))
-    blank_image.paste(_to_pil_image(X[image_id]),(1,1)) 
+    blank_image.paste(_to_pil_image(X[image_id]),(1,1))
     blank_image.paste(_to_pil_image(best_model.apply(X[image_id])),(X.shape[1]+2,1)) 
     draw = ImageDraw.Draw(blank_image)
     draw.text((0, 0), "{}".format(p1), (255, 0, 0))
     draw.text((X.shape[1]+1, 0), "{}".format(p2), (255, 0, 0))
     blank_image.save(P_tt.format(image_id,p1,p2))
+
+    #create img for cam
+    P_tt = os.path.join(P,"best_img_cam{}_.png")
+    blank_image = Image.new("RGB",(X.shape[1]*2+3,X.shape[2]+2))
+    cam_image_original = np.expand_dims(get_cam(X[image_id]), 2)
+    cam_image_modified = np.expand_dims(get_cam(best_model.apply(X[image_id])), 2)
+    blank_image.paste(_to_pil_image(cam_image_original),(1,1)) 
+    blank_image.paste(_to_pil_image(cam_image_modified),(X.shape[1]+2,1))
+    draw = ImageDraw.Draw(blank_image)
+    draw.text((0, 0), "{}".format('original'), (255, 0, 0))
+    draw.text((X.shape[1]+1, 0), "{}".format('attacked'), (255, 0, 0))
+    blank_image.save(P_tt.format(image_id))
+
+    P_tt = os.path.join(P,"best_img_cam_on_image{}_.png")
+    blank_image = Image.new("RGB",(X.shape[1]*2+3,X.shape[2]+2))
+    cam_on_image_original = np.float32(get_cam_on_image(X[image_id], cam_image_original)) / 255
+    cam_on_image_modified = np.float32(get_cam_on_image(X[image_id], cam_image_modified)) / 255
+    blank_image.paste(_to_pil_image(cam_on_image_original),(1,1)) 
+    blank_image.paste(_to_pil_image(cam_on_image_modified),(X.shape[1]+2,1))
+    draw = ImageDraw.Draw(blank_image)
+    draw.text((0, 0), "{}".format('original'), (255, 0, 0))
+    draw.text((X.shape[1]+1, 0), "{}".format('attacked'), (255, 0, 0))
+    blank_image.save(P_tt.format(image_id))

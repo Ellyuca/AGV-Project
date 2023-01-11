@@ -25,6 +25,27 @@ from agv_tests import *
 from agv_tests import mkdir_p, save_adv_best
 from log import Log
 
+import time
+start_time = time.time()
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+	try:
+		# Currently, memory growth needs to be the same across GPUs
+		for gpu in gpus:
+			tf.config.experimental.set_memory_growth(gpu, True)
+		logical_gpus = tf.config.list_logical_devices('GPU')
+		print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+	except RuntimeError as e:
+		# Memory growth must be set before GPUs have been initialized
+		print(e)
+
+P = os.getcwd()
+P = str(P) + '/img_cam/'
+if not os.path.exists(P):
+  # if the demo_folder directory is not present 
+  # then create it.
+  os.makedirs(P)
+
 def main(dataset_name,
          model_path, 
          logs_path,
@@ -55,16 +76,17 @@ def main(dataset_name,
     print("the models are: ", model_name)
 
     #fitness 
-    f_quality  = lambda Xf, X : float(inv_attack_rate(model_one, Xf, X ))
+    #f_quality  = lambda Xf, X : float(inv_attack_rate(model_one, Xf, X ))
 
+    f_distance_xai = get_distance_functions(dataset_name, model_one)['ssim_not_inv']
     f_distance_one = get_distance_functions(dataset_name, model_one)[distance_function_one]
     #by ranking or by pareto
     if selection == "ranking":
-        fit = lambda Xf, X, Y  : f_quality(Xf, X) #+ f_distance(Xf,X) * 0.95     
+        fit = lambda Xf, X, Y  : f_distance_xai(Xf, X) #+ f_distance(Xf,X) * 0.95     
     else: #pareto or pareto|no-params
       # if selection == "pareto":
         fit = lambda Xf, X, Y, only_quality = False: \
-                [f_quality(Xf, X), f_distance_one(Xf, X)] if not only_quality else f_quality(Xf, X)
+                [f_distance_xai(Xf, X), f_distance_one(Xf, X)] if not only_quality else f_distance_xai(Xf, X)
 
     #train AGV 
     opt = None
@@ -149,6 +171,9 @@ def main(dataset_name,
         mkdir_p(P)   
         P_df = os.path.join(P,  "class_info_df.csv")
         class_info_df.to_csv(P_df, encoding='utf-8', index=False)
+  
+    print("--- %s seconds ---" % (time.time() - start_time))
+
                     
 
 
