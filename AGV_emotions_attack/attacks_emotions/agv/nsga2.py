@@ -73,5 +73,7 @@ def selection(population_size,front,chroms_obj_record):
 '''---------NSGA-2 pass --------'''
 def nsga_2_pass(N, chroms_obj_record):
     front = non_dominated_sorting(len(chroms_obj_record),chroms_obj_record)
+    # print('selezione')
+    # print(N)
     return selection(N, front, chroms_obj_record)
       
