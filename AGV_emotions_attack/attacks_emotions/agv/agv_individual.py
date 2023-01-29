@@ -22,6 +22,8 @@ class Individual(object):
             self.params += [d.value for d in self.filters[fid].domains]
         self.fitness_max = fitness_max
         self.fitness = fitness_max
+        if X is not None: # in order to access the image X as Individual's attribute 
+            self.X = X
 
 
     def apply(self, image, params = None):

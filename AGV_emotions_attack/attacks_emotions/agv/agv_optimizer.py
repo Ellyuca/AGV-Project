@@ -21,6 +21,9 @@ import json
 from agv_tests import mkdir_p
 from agv_tests import get_cam
 
+from fitness import inv_attack_rate
+from agv_datasets import build_model
+
 import math 
 STATE_EXT = "state"
 JSON_EXT = "json"
@@ -223,8 +226,13 @@ class AGVOptimizer(object):
         #select
         all_elements = [offspring for offspring in offsprings]
         all_elements+= [parent for parent in self.population]
-        new_pop = nsga_2_pass(len(self.population), [e.fitness for e in all_elements])
-        self.population = [all_elements[p] for p in new_pop]
+        to_select = [] # new list containing elements that don't lead to a class change
+        for element in all_elements: # find these elements checking the inv_attack_rate
+            if inv_attack_rate(self.model, np.expand_dims(element.X, axis=0), np.expand_dims(element.apply(element.X), axis=0)) == 1:
+                to_select.append(element)
+        
+        new_pop = nsga_2_pass(len(self.population), [e.fitness for e in to_select])
+        self.population = [to_select[p] for p in new_pop]
 
     def __init__(self, 
                  Nf,   
@@ -284,6 +292,7 @@ class AGVOptimizer(object):
         self._pbest = None
         self._first= True
 
+        self.model = build_model()
 
         #test        
         if  selection_type.find("pareto") >= 0:

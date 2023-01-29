@@ -13,5 +13,6 @@ TEST/
 img_cam/
 
 prova.py
+prova*
 
 *.sh
