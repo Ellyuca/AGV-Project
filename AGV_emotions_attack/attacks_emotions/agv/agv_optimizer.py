@@ -231,6 +231,7 @@ class AGVOptimizer(object):
             if inv_attack_rate(self.model, np.expand_dims(element.X, axis=0), np.expand_dims(element.apply(element.X), axis=0)) == 1:
                 to_select.append(element)
         
+        self.selection_log.append(20 - len(to_select))#class change logging
         new_pop = nsga_2_pass(len(self.population), [e.fitness for e in to_select])
         self.population = [to_select[p] for p in new_pop]
 
@@ -292,7 +293,9 @@ class AGVOptimizer(object):
         self._pbest = None
         self._first= True
 
+        # attribute for class change logging
         self.model = build_model()
+        self.selection_log = []
 
         #test        
         if  selection_type.find("pareto") >= 0:
@@ -508,5 +511,9 @@ class AGVOptimizer(object):
             self._last_epoch = e+1
             #save state if needed
             #self._save_state(e)           
+
+        #logging number of elements that caused class change
+        with open("TEST/logs_txts/log_selection.txt", "w") as file:
+            file.write(f'image id: {self.img_id} --- {self.selection_log}')
 
         return self._return_best()
