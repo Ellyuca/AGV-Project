@@ -56,6 +56,29 @@ def get_iou(ground_truth, pred):
 	iou = area_of_intersection / area_of_union
 	return iou
 
+def get_center_distance(ground_truth, pred):
+    """
+    Calculate Distance between Center of 2 bounding rectangle.
+    Arguments:
+        ground_truth: an array of dim 4 --> [x1, y1, x2, y2]
+			where (x1, y1) and (x2, y2) are the top-left and bottom-right
+			corner of the bounding rect
+        pred: an array of dim 4 --> [x1, y1, x2, y2]
+			where (x1, y1) and (x2, y2) are the top-left and bottom-right
+			corner of the bounding rect
+    Returns:
+        The Distance between Center of the 2 bounding rect.
+    """
+    # Center Point of ground_truth
+    cx1 = (ground_truth[0] + ground_truth[2]) / 2
+    cy1 = (ground_truth[1] + ground_truth[3]) / 2
+    # Center Point of Attacked image
+    cx2 = (pred[0] + pred[2]) / 2
+    cy2 = (pred[1] + pred[3]) / 2
+    # Computing distance
+    distance = math.dist([cx1, cy1], [cx2, cy2])
+    #min-max rescaling
+    return distance / 315.36
 
 def _predict(model,X):
     return model.predict(X)
@@ -153,8 +176,32 @@ def IoU(X1, X2):
     contours_modified_image, _ = cv2.findContours(thresh_modified_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     x_o,y_o,w_o,h_o = cv2.boundingRect(contours_original_image[0])
     x_m,y_m,w_m,h_m = cv2.boundingRect(contours_modified_image[0])
-    iou = get_iou([x_o, y_o, x_o + w_o,  y_o + h_o], [x_m, y_m, x_m + w_m, y_m + h_m])
-    return iou
+    return get_iou([x_o, y_o, x_o + w_o,  y_o + h_o], [x_m, y_m, x_m + w_m, y_m + h_m])
+
+
+def center_distance(X1, X2):
+    """
+    X1 is the Xf, X2 is the original
+    """
+    original_image_cam = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
+
+    modified_image = np.float32(X1[0])
+    input_tensor_modified = preprocess_image(modified_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    cam_algorithm = EigenCAM
+    with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
+        cam.batch_size = 128
+        grayscale_cam_eigen_modified = cam(input_tensor=input_tensor_modified, targets=None)
+        X1 = grayscale_cam_eigen_modified[0, :]
+    
+    modified_image_cam = np.uint8(X1 * 255)
+    _, thresh_original_image = cv2.threshold(original_image_cam, 170, 255, cv2.THRESH_BINARY)
+    _, thresh_modified_image = cv2.threshold(modified_image_cam, 170, 255, cv2.THRESH_BINARY)
+    contours_original_image, _ = cv2.findContours(thresh_original_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours_modified_image, _ = cv2.findContours(thresh_modified_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    x_o,y_o,w_o,h_o = cv2.boundingRect(contours_original_image[0])
+    x_m,y_m,w_m,h_m = cv2.boundingRect(contours_modified_image[0])
+    # Inverting the center distance because we want to maximize it
+    return 1 - get_center_distance([x_o, y_o, x_o + w_o,  y_o + h_o], [x_m, y_m, x_m + w_m, y_m + h_m])
 
 
 # Note: KL-divergence is not symentric.

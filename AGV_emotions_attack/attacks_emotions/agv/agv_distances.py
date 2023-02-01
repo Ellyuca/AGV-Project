@@ -9,6 +9,7 @@ from agv_compute_fid import ComputeFid
 from fitness import ssim_score
 from fitness import ssim_score_not_inv
 from fitness import IoU
+from fitness import center_distance
 
 def get_distance_functions(dataset_name=None, model=None):
     if dataset_name is not None and model is not None: #to get names (main args)
@@ -24,4 +25,5 @@ def get_distance_functions(dataset_name=None, model=None):
         'ssim':                       lambda Xf, X: float(ssim_score(Xf,X)),
         'ssim_not_inv':               lambda Xf, X: float(ssim_score_not_inv(Xf,X)),
         'IoU':                        lambda Xf, X: float(IoU(Xf,X)),
+        'center_distance':            lambda Xf, X: float(center_distance(Xf,X)),
     }

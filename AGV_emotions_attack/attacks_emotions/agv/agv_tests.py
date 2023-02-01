@@ -33,6 +33,11 @@ def get_cam(img):
 		image_cam = grayscale_cam_eigen_original[0, :]
 	return image_cam
 
+def get_center(coordinates):
+	cx = int((coordinates[0] + coordinates[2]) / 2)
+	cy = int((coordinates[1] + coordinates[3]) / 2)
+	return (cx, cy)
+
 def get_cam_on_image(rgb_img, cam):
 	cam_on_image = show_cam_on_image(rgb_img, cam, use_rgb=True)
 	return cam_on_image
@@ -199,6 +204,11 @@ def save_adv_best(best_folder, image_id=0, dataset_name = None ):
 	x_m,y_m,w_m,h_m = cv2.boundingRect(contours_modified_image[0])
 	cv2.rectangle(cam_on_image_modified, (x_o, y_o), (x_o + w_o, y_o + h_o), (0,1,0), 2)
 	cv2.rectangle(cam_on_image_modified, (x_m, y_m), (x_m + w_m, y_m + h_m), (1,0,0), 2)
+	#draw center point of IoU
+	center_original = get_center((x_o, y_o, x_o + w_o, y_o + h_o))
+	center_modified = get_center((x_m, y_m, x_m + w_m, y_m + h_m))
+	cv2.circle(cam_on_image_modified, center_original, radius=1, color=(0, 1, 0), thickness=-1)
+	cv2.circle(cam_on_image_modified, center_modified, radius=1, color=(1, 0, 0), thickness=-1)
 	blank_image.paste(_to_pil_image(cam_on_image_modified))
 	draw = ImageDraw.Draw(blank_image)
 	draw.text((0, 0), "{}".format('original'), (0, 255, 0))
