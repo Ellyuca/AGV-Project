@@ -513,7 +513,7 @@ class AGVOptimizer(object):
             #self._save_state(e)           
 
         #logging number of elements that caused class change
-        with open("TEST/logs_txts/log_selection.txt", "w") as file:
-            file.write(f'image id: {self.img_id} --- {self.selection_log}')
+        with open("TEST/logs_txts/log_selection.txt", "a") as file:
+            file.write(f'image id: {self.img_id} --- {self.selection_log}\n')
 
         return self._return_best()
