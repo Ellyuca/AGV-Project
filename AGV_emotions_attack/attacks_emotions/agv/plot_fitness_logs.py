@@ -1,7 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
-img_id = 0
+parser = argparse.ArgumentParser(description='Process image id by command line.')
+parser.add_argument("-img_id", "-id", type=int, help='image id for plot fitness during epochs', default=0)
+inargs = parser.parse_args()
+
+img_id = inargs.img_id
+print(img_id)
 logs = []
 
 with open(f"TEST/logs_txts/img_{img_id}_TEST.txt", "r") as file:
