@@ -183,6 +183,7 @@ def center_distance(X1, X2):
     """
     X1 is the Xf, X2 is the original
     """
+    soglia = 190
     original_image_cam = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
 
     modified_image = np.float32(X1[0])
@@ -194,8 +195,8 @@ def center_distance(X1, X2):
         X1 = grayscale_cam_eigen_modified[0, :]
     
     modified_image_cam = np.uint8(X1 * 255)
-    _, thresh_original_image = cv2.threshold(original_image_cam, 170, 255, cv2.THRESH_BINARY)
-    _, thresh_modified_image = cv2.threshold(modified_image_cam, 170, 255, cv2.THRESH_BINARY)
+    _, thresh_original_image = cv2.threshold(original_image_cam, soglia, 255, cv2.THRESH_BINARY)
+    _, thresh_modified_image = cv2.threshold(modified_image_cam, soglia, 255, cv2.THRESH_BINARY)
     contours_original_image, _ = cv2.findContours(thresh_original_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_modified_image, _ = cv2.findContours(thresh_modified_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     x_o,y_o,w_o,h_o = cv2.boundingRect(contours_original_image[0])
