@@ -133,23 +133,34 @@ def ssim_score(X1,X2): #X1 is the Xf, X2 is the original; order shoudlnt matter 
   return 1 - (SSIM / X1.shape[0])#if the two images are identical then the returned score will be zero; 1 otherwise
 
 
-def ssim_score_not_inv(X1, X2): #ssim to use with the explaination cam. It is not inverted beacuse we want to minimize it
-    #X1 is the Xf, X2 is the original
+def ssim_score_not_inv(X1, X2):
+    """
+    ssim to use with the explaination cam. It is not inverted beacuse we want to minimize it
+    X1 is the Xf, X2 is the original
+    """
     X2 = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
-    X2 = np.float32(X2) / 255
+    # X2 = np.float32(X2) / 255 #to use without thresholding
+    X2 = np.uint8(X2)
+    threshold_value = 230
+
     # original_image = np.float32(X2[0])
-    modified_image = np.float32(X1[0])
     # input_tensor_original = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    modified_image = np.float32(X1[0])
     input_tensor_modified = preprocess_image(modified_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     cam_algorithm = EigenCAM
     with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
         cam.batch_size = 128
         # grayscale_cam_eigen_original = cam(input_tensor=input_tensor_original, targets=None)
         grayscale_cam_eigen_modified = cam(input_tensor=input_tensor_modified, targets=None)
-
-        # Here grayscale_cam has only one image in the batch
         # X2 = grayscale_cam_eigen_original[0, :]
         X1 = grayscale_cam_eigen_modified[0, :]
+
+    #to use only for threshold application on ssim
+    modified_image_cam = np.uint8(X1 * 255)
+    _, thresh_original_image = cv2.threshold(X2, threshold_value, 255, cv2.THRESH_TOZERO)
+    _, thresh_modified_image = cv2.threshold(modified_image_cam, threshold_value, 255, cv2.THRESH_TOZERO)
+    X2 = np.float32(thresh_original_image) / 255
+    X1 = np.float32(thresh_modified_image) / 255
 
     SSIM = ssim(X2, X1, data_range = 1, multichannel=False)
     return SSIM
@@ -183,7 +194,7 @@ def center_distance(X1, X2):
     """
     X1 is the Xf, X2 is the original
     """
-    soglia = 190
+    threshold_value = 170
     original_image_cam = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
 
     modified_image = np.float32(X1[0])
@@ -195,8 +206,8 @@ def center_distance(X1, X2):
         X1 = grayscale_cam_eigen_modified[0, :]
     
     modified_image_cam = np.uint8(X1 * 255)
-    _, thresh_original_image = cv2.threshold(original_image_cam, soglia, 255, cv2.THRESH_BINARY)
-    _, thresh_modified_image = cv2.threshold(modified_image_cam, soglia, 255, cv2.THRESH_BINARY)
+    _, thresh_original_image = cv2.threshold(original_image_cam, threshold_value, 255, cv2.THRESH_BINARY)
+    _, thresh_modified_image = cv2.threshold(modified_image_cam, threshold_value, 255, cv2.THRESH_BINARY)
     contours_original_image, _ = cv2.findContours(thresh_original_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_modified_image, _ = cv2.findContours(thresh_modified_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     x_o,y_o,w_o,h_o = cv2.boundingRect(contours_original_image[0])

@@ -46,8 +46,8 @@ ssim = [fitness_min[i][1] for i in range(len(fitness_min))]
 plt.rcParams['figure.figsize'] = [10, 8]
 fig, axs = plt.subplots(2)
 fig.suptitle('Fitness log over epochs')
-axs[0].set_title('center_distance')
+axs[0].set_title('ssim between CAMs')
 axs[0].plot(center_distance, 'tab:blue')
-axs[1].set_title('ssim')
+axs[1].set_title('ssim between imgs')
 axs[1].plot(ssim, 'tab:green')
 plt.savefig(f'TEST/logs_txts/plot_img_{img_id}_TEST.png')
