@@ -7,7 +7,7 @@ parser.add_argument("-img_id", "-id", type=int, help='image id for plot fitness 
 inargs = parser.parse_args()
 
 img_id = inargs.img_id
-threshold_value_list = [0, 170, 230]
+threshold_value_list = [0, 170, 200, 230]
 threshold_value_list_color = ['orange', 'red', 'blue', 'green']
 print(img_id)
 logs = []

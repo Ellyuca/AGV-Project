@@ -9,7 +9,7 @@ __pycache__/
 .ipynb_checkpoints
 
 #TEST dir
-# TEST/
+TEST/
 img_cam/
 
 prova.py

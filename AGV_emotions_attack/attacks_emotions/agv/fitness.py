@@ -141,7 +141,7 @@ def ssim_score_not_inv(X1, X2):
     X2 = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
     # X2 = np.float32(X2) / 255 #to use without thresholding
     X2 = np.uint8(X2)
-    threshold_value = 230
+    threshold_value = 200
 
     # original_image = np.float32(X2[0])
     # input_tensor_original = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
