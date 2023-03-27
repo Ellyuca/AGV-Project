@@ -138,10 +138,13 @@ def ssim_score_not_inv(X1, X2):
     ssim to use with the explaination cam. It is not inverted beacuse we want to minimize it
     X1 is the Xf, X2 is the original
     """
+    thresh_yes = False
     X2 = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
-    # X2 = np.float32(X2) / 255 #to use without thresholding
-    X2 = np.uint8(X2)
-    threshold_value = 200
+    if thresh_yes:
+        X2 = np.uint8(X2)
+        threshold_value = 200
+    else:
+        X2 = np.float32(X2) / 255
 
     # original_image = np.float32(X2[0])
     # input_tensor_original = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -155,12 +158,13 @@ def ssim_score_not_inv(X1, X2):
         # X2 = grayscale_cam_eigen_original[0, :]
         X1 = grayscale_cam_eigen_modified[0, :]
 
-    #to use only for threshold application on ssim
-    modified_image_cam = np.uint8(X1 * 255)
-    _, thresh_original_image = cv2.threshold(X2, threshold_value, 255, cv2.THRESH_TOZERO)
-    _, thresh_modified_image = cv2.threshold(modified_image_cam, threshold_value, 255, cv2.THRESH_TOZERO)
-    X2 = np.float32(thresh_original_image) / 255
-    X1 = np.float32(thresh_modified_image) / 255
+    
+    if thresh_yes:
+        modified_image_cam = np.uint8(X1 * 255)
+        _, thresh_original_image = cv2.threshold(X2, threshold_value, 255, cv2.THRESH_TOZERO)
+        _, thresh_modified_image = cv2.threshold(modified_image_cam, threshold_value, 255, cv2.THRESH_TOZERO)
+        X2 = np.float32(thresh_original_image) / 255
+        X1 = np.float32(thresh_modified_image) / 255
 
     SSIM = ssim(X2, X1, data_range = 1, multichannel=False)
     return SSIM
