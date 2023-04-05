@@ -12,9 +12,9 @@ json_filenames = sorted(filenames, key= lambda x: int(x.split('_')[1]))
 fitness_logs = []
 id = -1
 for filename in json_filenames:
-    id += 1
-    if id == 8:
-        continue
+    # id += 1
+    # if id == 8:
+    #     continue
 
     with open(directory_json + filename) as file:
         parsed_json = json.load(file)
