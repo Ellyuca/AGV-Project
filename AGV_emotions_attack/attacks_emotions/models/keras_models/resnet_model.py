@@ -1,5 +1,5 @@
 import sys, os
-from turtle import shape
+# from turtle import shape
 from xml.etree.ElementInclude import include
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils import load_externals

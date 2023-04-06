@@ -227,11 +227,18 @@ class AGVOptimizer(object):
         all_elements = [offspring for offspring in offsprings]
         all_elements+= [parent for parent in self.population]
         to_select = [] # new list containing elements that don't lead to a class change
+        print('AO')
         for element in all_elements: # find these elements checking the inv_attack_rate
             if inv_attack_rate(self.model, np.expand_dims(element.X, axis=0), np.expand_dims(element.apply(element.X), axis=0)) == 1:
                 to_select.append(element)
+            print('ELEMENT')
+            print(element.filters)
+            print()
         
         self.selection_log.append(20 - len(to_select))#class change logging
+        print('---------------------------------------------------')
+        print(f'NUMERO DI POSSIBILI FILTRI DA SCEGLIERE {len(to_select)}')
+        print('---------------------------------------------------')
         new_pop = nsga_2_pass(len(self.population), [e.fitness for e in to_select])
         self.population = [to_select[p] for p in new_pop]
 
