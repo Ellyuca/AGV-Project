@@ -139,7 +139,7 @@ def ssim_score_not_inv(X1, X2):
     X1 is the Xf, X2 is the original
     """
     thresh_yes = False
-    X2 = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
+    X2 = cv2.imread('/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
     if thresh_yes:
         X2 = np.uint8(X2)
         threshold_value = 200
