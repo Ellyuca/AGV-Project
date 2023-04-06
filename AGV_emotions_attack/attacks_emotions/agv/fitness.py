@@ -129,7 +129,7 @@ def ssim_score(X1,X2): #X1 is the Xf, X2 is the original; order shoudlnt matter 
   # score = ssim(X2,X1,data_range = 1, multichannel=True)
   SSIM = 0.0
   for sample in range(X1.shape[0]):     
-    SSIM +=  ssim(X2[sample],X1[sample],data_range = 1, multichannel=True)
+    SSIM +=  ssim(X2[sample],X1[sample],data_range = 1, channel_axis=-1)
   return 1 - (SSIM / X1.shape[0])#if the two images are identical then the returned score will be zero; 1 otherwise
 
 
@@ -166,7 +166,7 @@ def ssim_score_not_inv(X1, X2):
         X2 = np.float32(thresh_original_image) / 255
         X1 = np.float32(thresh_modified_image) / 255
 
-    SSIM = ssim(X2, X1, data_range = 1, multichannel=False)
+    SSIM = ssim(X2, X1, data_range = 1, channel_axis=-1)
     return SSIM
 
 
