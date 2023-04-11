@@ -78,7 +78,7 @@ def main(dataset_name,
     #fitness 
     #f_quality  = lambda Xf, X : float(inv_attack_rate(model_one, Xf, X ))
 
-    f_distance_xai = get_distance_functions(dataset_name, model_one)['ssim_not_inv']
+    f_distance_xai = get_distance_functions(dataset_name, model_one)['center_distance']
     f_distance_one = get_distance_functions(dataset_name, model_one)[distance_function_one]
     #by ranking or by pareto
     if selection == "ranking":

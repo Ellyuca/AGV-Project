@@ -199,8 +199,7 @@ def center_distance(X1, X2):
     X1 is the Xf, X2 is the original
     """
     threshold_value = 170
-    original_image_cam = cv2.imread('/XAI_AML/AGV-Project/AGV_emotions_attack/img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
-
+    original_image_cam = cv2.imread('img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
     modified_image = np.float32(X1[0])
     input_tensor_modified = preprocess_image(modified_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     cam_algorithm = EigenCAM
