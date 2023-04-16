@@ -150,7 +150,7 @@ def ssim_score_not_inv(X1, X2):
     # input_tensor_original = preprocess_image(original_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     modified_image = np.float32(X1[0])
     input_tensor_modified = preprocess_image(modified_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    cam_algorithm = EigenCAM
+    cam_algorithm = AblationCAM
     with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
         cam.batch_size = 128
         # grayscale_cam_eigen_original = cam(input_tensor=input_tensor_original, targets=None)
