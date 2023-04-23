@@ -26,9 +26,9 @@ class_names = json.load(json_file)
 def get_cam(img):
 	img = np.float32(img)
 	input_tensor = preprocess_image(img, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-	cam_algorithm = AblationCAM
+	cam_algorithm = EigenCAM
 	with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
-		cam.batch_size = 1536
+		cam.batch_size = 256
 		grayscale_cam_eigen_original = cam(input_tensor=input_tensor, targets=None)
 		image_cam = grayscale_cam_eigen_original[0, :]
 	return image_cam

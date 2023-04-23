@@ -123,7 +123,7 @@ def main(dataset_name,
                               X = X[i]
                             )
           OG_class = np.argmax(model_one.predict(X[i:i+1]))
-          #da eliminare commento print(X[i:i+1].shape, X[i:i+1].mean(), "original class:", Y[i:i+1], np.argmax(Y[i:i+1]), ", predicted class:", OG_class)
+          print(X[i:i+1].shape, X[i:i+1].mean(), "original class:", Y[i:i+1], np.argmax(Y[i:i+1]), ", predicted class:", OG_class)
           best_ind = opt.fit(X[i:i+1], Y[i:i+1], batch_size, epochs)
           
           best.append(best_ind)
@@ -137,10 +137,10 @@ def main(dataset_name,
           prediction_on_bestind[i] = {"original_class":OG_class,
                                       "modified class":MOD_class}
           #compute all fit
-          #da eliminare commento print("Getting info:")           
-          #da eliminare commento print("Best fit:", best_ind.fitness)
-          #da eliminare commento print("Best genotype:", best_ind.genotype)
-          #da eliminare commento print("Best params:", best_ind.params)
+          print("Getting info:")           
+          print("Best fit:", best_ind.fitness)
+          print("Best genotype:", best_ind.genotype)
+          print("Best params:", best_ind.params)
     
           #save
           P = os.path.splitext(model_path)[0]  

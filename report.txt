@@ -1,8 +1,16 @@
 ATTACCO con 5 filtri su EigenCAM (utilizzando doppia ssim)
 
-Mean value for ssim_not_inv: 0.6378287387954004
-Mean value for ssim: 0.15181819323835702
+Prime 30 img:
+- Mean value for ssim_not_inv: 0.6378287387954004
+- Mean value for ssim: 0.15181819323835702
 
+Su tutto il dataset (200 img):
+- Mean value for ssim_not_inv: 0.6007907153107226
+- Mean value for ssim: 0.15232910931110383
+
+ATTACCO EigenCAM doppia ssim 6 filtri
+Mean value for ssim_not_inv: 0.5766398371942342
+Mean value for ssim: 0.18512539938092232
 ----------------------------------------------------------
 
 ATTACCO con 5 filtri su GradCAM (utilizzando doppia ssim)
@@ -21,3 +29,8 @@ ATTACCO con 3 filtri su EigenCAM (utilizzando doppia center_distance + ssim)
 
 Mean value for ssim_not_inv: 0.8602444827304809
 Mean value for ssim: 0.07587910294532776
+
+
+ATTACCO con 5 filtri su EigenCAM (utilizzando doppia center_distance + ssim)
+Mean value for ssim_not_inv: 0.829136974704341
+Mean value for ssim: 0.10992976605892181
