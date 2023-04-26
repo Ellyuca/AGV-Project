@@ -133,6 +133,26 @@ def ssim_score(X1,X2): #X1 is the Xf, X2 is the original; order shoudlnt matter 
   return 1 - (SSIM / X1.shape[0])#if the two images are identical then the returned score will be zero; 1 otherwise
 
 
+def ssim_score_target(X1, X2):
+    """
+    ssim to use with the explaination cam. It is not inverted beacuse we want to minimize it
+    X1 is the Xf, X2 is the original
+    """
+    X2 = cv2.imread('img_cam/img_cam.png',cv2.IMREAD_GRAYSCALE)
+    X2 = np.float32(X2) / 255
+
+    modified_image = np.float32(X1[0])
+    input_tensor_modified = preprocess_image(modified_image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    cam_algorithm = EigenCAM
+    with cam_algorithm(model = MODEL_gradcam, target_layers = TARGET_LAYERS, use_cuda = True) as cam:
+        cam.batch_size = 256
+        grayscale_cam_eigen_modified = cam(input_tensor=input_tensor_modified, targets=None)
+        X1 = grayscale_cam_eigen_modified[0, :]
+
+    SSIM = ssim(X2, X1, data_range = 1, channel_axis=-1)
+    return 1 - SSIM
+
+
 def ssim_score_not_inv(X1, X2):
     """
     ssim to use with the explaination cam. It is not inverted beacuse we want to minimize it

@@ -41,6 +41,7 @@ if gpus:
 
 P = os.getcwd()
 P = str(P) + '/img_cam/'
+from random import choice #new method
 if not os.path.exists(P):
   # if the demo_folder directory is not present 
   # then create it.
@@ -78,7 +79,7 @@ def main(dataset_name,
     #fitness 
     #f_quality  = lambda Xf, X : float(inv_attack_rate(model_one, Xf, X ))
 
-    f_distance_xai = get_distance_functions(dataset_name, model_one)['ssim_not_inv']
+    f_distance_xai = get_distance_functions(dataset_name, model_one)['ssim_score_target']
     f_distance_one = get_distance_functions(dataset_name, model_one)[distance_function_one]
     #by ranking or by pareto
     if selection == "ranking":
@@ -124,7 +125,10 @@ def main(dataset_name,
                             )
           OG_class = np.argmax(model_one.predict(X[i:i+1]))
           print(X[i:i+1].shape, X[i:i+1].mean(), "original class:", Y[i:i+1], np.argmax(Y[i:i+1]), ", predicted class:", OG_class)
-          best_ind = opt.fit(X[i:i+1], Y[i:i+1], batch_size, epochs)
+          # print(f'X SHAPE {X.shape[0]}')
+          target_id = choice([target_choice for target_choice in range(X.shape[0]) if target_choice not in [i]])
+          print(f'CHOICE {target_id}')
+          best_ind = opt.fit(X[i:i+1], Y[i:i+1], batch_size, X[target_id:target_id+1], target_id, epochs)
           
           best.append(best_ind)
           print("class of original image: ", OG_class )

@@ -472,9 +472,9 @@ class AGVOptimizer(object):
         optimizer_state.fitness = fitness
         return optimizer_state
         
-    def fit(self, X, Y, batch, epoch = 5):
+    def fit(self, X, Y, batch, target, target_id, epoch = 5):
         #salvataggio cam per calcolarla solo una volta, da migliorare
-        cam_original_image = get_cam(X[0])
+        cam_original_image = get_cam(target[0])
         P = str(os.getcwd()) + "/img_cam/img_cam.png"
         plt.imsave(P, cam_original_image, cmap='gray')
 
@@ -509,7 +509,9 @@ class AGVOptimizer(object):
                     if type(fits) == float: #it is attack rate
                         fitsfile.write("{}\n".format(1.0-fits))
                     else:
-                        fitsfile.write("{}\t{}\n".format(1.0-fits[0],fits[1]))
+                        fitsfile.write("target id: {}\t".format(target_id))
+                        fitsfile.write("{}\t{}\n".format(fits[0],fits[1]))
+                        # before was fitsfile.write("{}\t{}\n".format(1.0-fits[0],fits[1]))
                 
             #update last epoch
             self._last_epoch = e+1
